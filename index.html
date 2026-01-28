@@ -1,169 +1,1086 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CRM Projetos — Mayani</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <title>CRM de Propostas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #020712;
+      --bg-elevated: #050b18;
+      --bg-card: #070d1d;
+      --border-soft: 1px solid rgba(255, 255, 255, 0.04);
+      --accent: #4ade80;
+      --accent-strong: #22c55e;
+      --accent-soft: rgba(74, 222, 128, 0.12);
+      --danger-soft: rgba(248, 113, 113, 0.15);
+      --danger: #f97373;
+      --text: #f9fafb;
+      --text-soft: #9ca3af;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-full: 999px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #020617, #020617 60%, #000000 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 3rem;
+    }
+
+    /* HEADER */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .header-left h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .header-left span {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.12rem 0.7rem;
+      font-size: 0.7rem;
+      margin-top: 0.4rem;
+      color: var(--text-soft);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      border-radius: var(--radius-full);
+      border: var(--border-soft);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .btn:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.7);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-strong), #22c55e);
+      border-color: transparent;
+      color: #022c22;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 14px 38px rgba(34, 197, 94, 0.45);
+    }
+
+    /* GRID PRINCIPAL */
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: 2fr 2fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem 1rem 1.1rem;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin-bottom: 0.75rem;
+    }
+
+    /* VISÃO GERAL */
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .kpi-card {
+      border-radius: var(--radius-md);
+      background: #020617;
+      border: 1px solid rgba(30, 64, 175, 0.65);
+      padding: 0.6rem 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .kpi-label {
+      color: var(--text-soft);
+      margin-bottom: 0.3rem;
+    }
+
+    .kpi-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .kpi-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .kpi-pill.ok {
+      background: rgba(22, 163, 74, 0.18);
+      color: #4ade80;
+    }
+
+    .kpi-pill.bad {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .kpi-total-open {
+      margin-top: 0.4rem;
+      padding: 0.6rem 0.7rem;
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .kpi-total-open span:first-child {
+      color: var(--text-soft);
+    }
+
+    .kpi-total-open strong {
+      font-size: 1rem;
+      color: var(--accent-strong);
+    }
+
+    /* FILTROS */
+
+    .filters-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .filters-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .filters-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .input,
+    .select {
+      background: #020617;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.38rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      outline: none;
+      min-width: 0;
+    }
+
+    .input {
+      flex: 1;
+    }
+
+    .select {
+      cursor: pointer;
+    }
+
+    .filters-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--text-soft);
+    }
+
+    .filters-badges span {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-full);
+      padding: 0.15rem 0.55rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    /* ÁREA DO GRÁFICO */
+
+    .card-chart {
+      margin-top: 0;
+    }
+
+    .card-chart-body {
+      height: 260px;
+      position: relative;
+    }
+
+    /* LISTA / TABELA */
+
+    .card-list {
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-top: 0.6rem;
+    }
+
+    th, td {
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    th {
+      color: var(--text-soft);
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    tr:hover td {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .tag-status {
+      padding: 0.12rem 0.5rem;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tag-aberta {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+
+    .tag-ganha {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+
+    .tag-perdida {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+    }
+
+    .tag-atrasada {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+    }
+
+    /* MODAL NOVA PROPOSTA */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background: #020617;
+      border-radius: var(--radius-lg);
+      border: var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 1.2rem 1.3rem 1.3rem;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1rem;
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+    }
+
+    .modal-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .modal label {
+      display: block;
+      margin-bottom: 0.15rem;
+      color: var(--text-soft);
+    }
+
+    .modal input,
+    .modal select {
+      width: 100%;
+      font-size: 0.8rem;
+      padding: 0.38rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #020617;
+      color: var(--text);
+      outline: none;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 900px) {
+      .grid-top {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        padding: 1rem 1rem 2.5rem;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.7rem;
+      }
+
+      .header-actions {
+        align-self: stretch;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .filters-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="top">
-    <div class="brand">
-      <div class="logo">MR</div>
-      <div>
-        <h1>CRM de Propostas</h1>
-        <p class="muted">Simples • Local • GitHub Pages</p>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1>CRM de Propostas</h1>
+      <span>Simples · Local · GitHub Pages</span>
+      <div class="badge">
+        <div class="badge-dot"></div>
+        Dados salvos no seu navegador (localStorage)
       </div>
     </div>
-
-    <div class="actions">
-      <button id="btnNew" class="btn primary">+ Nova proposta</button>
-      <button id="btnExport" class="btn">Exportar</button>
-      <label class="btn file">
-        Importar
-        <input id="fileImport" type="file" accept="application/json" />
-      </label>
+    <div class="header-actions">
+      <button class="btn" id="btn-exportar">Exportar</button>
+      <button class="btn" id="btn-importar">Importar</button>
+      <button class="btn btn-primary" id="btn-nova">+ Nova proposta</button>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="cards">
-      <div class="card">
-        <div class="card-title">Visão geral</div>
-        <div class="stats" id="stats"></div>
+  <!-- GRID SUPERIOR -->
+  <div class="grid-top">
+    <!-- VISÃO GERAL -->
+    <section class="card">
+      <div class="card-title">Visão geral</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value" id="kpi-total">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Abertas</div>
+          <div class="kpi-value" id="kpi-abertas">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ganhas</div>
+          <div class="kpi-value" id="kpi-ganhas">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Atrasadas</div>
+          <div class="kpi-value" id="kpi-atrasadas">0</div>
+          <div class="kpi-pill ok" id="pill-atrasadas">
+            <span>ok</span>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Filtros</div>
-        <div class="filters">
-          <input id="q" class="input" placeholder="Buscar por cliente, parceiro, serviço, cidade..." />
-          <select id="stage" class="input"></select>
-          <select id="sort" class="input">
-            <option value="updated_desc">Mais recentes</option>
-            <option value="due_asc">Prazo mais próximo</option>
-            <option value="value_desc">Maior valor</option>
-            <option value="client_asc">Cliente A-Z</option>
+      <div class="kpi-total-open">
+        <span>Valor em aberto</span>
+        <strong id="kpi-valor-aberto">R$ 0,00</strong>
+      </div>
+    </section>
+
+    <!-- FILTROS -->
+    <section class="card">
+      <div class="card-title">Filtros</div>
+
+      <div class="filters-row">
+        <div class="filters-top">
+          <div class="filters-group">
+            <input
+              type="text"
+              class="input"
+              id="filtro-busca"
+              placeholder="Buscar por cliente, parceiro, serviço, cidade..."
+            />
+
+            <select class="select" id="filtro-etapa">
+              <option value="todas">Todas as etapas</option>
+              <option value="aberta">Abertas</option>
+              <option value="ganha">Ganhas</option>
+              <option value="perdida">Perdidas / Canceladas</option>
+            </select>
+
+            <select class="select" id="filtro-ordenar">
+              <option value="recentes">Mais recentes</option>
+              <option value="antigas">Mais antigas</option>
+              <option value="maior-valor">Maior valor</option>
+              <option value="menor-valor">Menor valor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filters-badges" id="info-filtros">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- GRÁFICO -->
+  <section class="card card-chart">
+    <div class="card-title">Valores das Propostas (R$)</div>
+    <div class="card-chart-body">
+      <canvas id="chart-valores"></canvas>
+    </div>
+  </section>
+
+  <!-- LISTA / TABELA -->
+  <section class="card card-list">
+    <div class="card-title">Propostas</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Parceiro</th>
+          <th>Serviço</th>
+          <th>Valor (R$)</th>
+          <th>Status</th>
+          <th>Entrada</th>
+          <th>Prazo</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-propostas">
+        <!-- preenchido via JS -->
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<!-- MODAL NOVA PROPOSTA -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Nova proposta</h2>
+      <button class="btn-ghost btn-sm" id="btn-fechar-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label for="novo-cliente">Cliente</label>
+        <input id="novo-cliente" type="text" required />
+      </div>
+
+      <div class="modal-row">
+        <div>
+          <label for="novo-parceiro">Parceiro</label>
+          <input id="novo-parceiro" type="text" />
+        </div>
+        <div>
+          <label for="novo-servico">Serviço</label>
+          <input id="novo-servico" type="text" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div>
+          <label for="novo-valor">Valor (R$)</label>
+          <input id="novo-valor" type="text" placeholder="5.500,00" />
+        </div>
+        <div>
+          <label for="novo-status">Status</label>
+          <select id="novo-status">
+            <option value="Aberta">Aberta</option>
+            <option value="Ganha">Ganha</option>
+            <option value="Perdida">Perdida / Cancelada</option>
           </select>
         </div>
       </div>
-    </section>
 
-    <!-- Gráfico em barras -->
-    <section class="card chart-card">
-      <div class="card-title">Valores das Propostas (R$)</div>
-      <div class="muted" style="margin-top:-6px;margin-bottom:10px;">
-        Ganhas × Perdidas/Canceladas × Em aberto
-      </div>
-      <canvas id="barValores" height="120"></canvas>
-    </section>
-
-    <section class="card table-card">
-      <div class="table-head">
-        <div class="card-title">Propostas</div>
-        <div class="muted" id="count"></div>
-      </div>
-
-      <div class="table">
-        <div class="row head">
-          <div>Etapa</div>
-          <div>Entrada</div>
-          <div>Cliente</div>
-          <div>Parceiro</div>
-          <div>Serviço</div>
-          <div>Cidade</div>
-          <div>Valor</div>
-          <div>Prazo</div>
-          <div>Status</div>
-          <div>Ações</div>
+      <div class="modal-row">
+        <div>
+          <label for="novo-data-entrada">Data de entrada</label>
+          <input id="novo-data-entrada" type="date" />
         </div>
-        <div id="rows"></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Modal -->
-  <div class="modal" id="modal" aria-hidden="true">
-    <div class="modal-content">
-      <div class="modal-head">
-        <h2 id="modalTitle">Nova proposta</h2>
-        <button class="icon" id="btnClose" title="Fechar">✕</button>
-      </div>
-
-      <form id="form">
-        <div class="grid">
-          <label class="field">
-            <span>Cliente *</span>
-            <input class="input" name="client" required maxlength="80" />
-          </label>
-
-          <label class="field">
-            <span>Contato (opcional)</span>
-            <input class="input" name="contact" maxlength="80" placeholder="WhatsApp / e-mail" />
-          </label>
-
-          <label class="field">
-            <span>Serviço *</span>
-            <input class="input" name="service" required maxlength="80" placeholder="Elétrico, SPDA, CFTV..." />
-          </label>
-
-          <label class="field">
-            <span>Cidade/UF</span>
-            <input class="input" name="city" maxlength="40" placeholder="Cuiabá/MT" />
-          </label>
-
-          <label class="field">
-            <span>Data de entrada *</span>
-            <input class="input" type="date" name="entry" required />
-          </label>
-
-          <label class="field">
-            <span>Parceiro</span>
-            <input class="input" name="partner" maxlength="60" placeholder="Nome do parceiro (opcional)" />
-          </label>
-
-          <label class="field">
-            <span>Valor (R$)</span>
-            <input class="input" name="value" inputmode="decimal" placeholder="7300" />
-          </label>
-
-          <label class="field">
-            <span>Prazo de resposta/entrega</span>
-            <input class="input" type="date" name="due" />
-          </label>
-
-          <label class="field">
-            <span>Etapa *</span>
-            <select class="input" name="stage" required></select>
-          </label>
-
-          <label class="field">
-            <span>Status *</span>
-            <select class="input" name="status" required>
-              <option value="ABERTA">ABERTA</option>
-              <option value="GANHA">GANHA</option>
-              <option value="PERDIDA">PERDIDA</option>
-              <option value="CANCELADA">CANCELADA</option>
-            </select>
-          </label>
-
-          <label class="field span2">
-            <span>Observações</span>
-            <textarea class="input" name="notes" rows="3" maxlength="600" placeholder="Escopo, pendências, docs, etc."></textarea>
-          </label>
+        <div>
+          <label for="novo-prazo">Prazo</label>
+          <input id="novo-prazo" type="date" />
         </div>
-
-        <div class="modal-actions">
-          <button type="button" id="btnDelete" class="btn danger hidden">Excluir</button>
-          <div class="spacer"></div>
-          <button type="button" id="btnCancel" class="btn">Cancelar</button>
-          <button type="submit" class="btn primary">Salvar</button>
-        </div>
-      </form>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" id="btn-cancelar-modal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btn-salvar-modal">Salvar</button>
     </div>
   </div>
+</div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js"></script>
+<script>
+  // ---------- UTILIDADES ----------
+  function parseValor(valorStr) {
+    if (typeof valorStr === "number") return valorStr;
+    if (!valorStr) return 0;
+    const limpo = valorStr.toString()
+      .replace(/[R$\s]/g, "")
+      .replace(/\./g, "")
+      .replace(",", ".");
+    const v = parseFloat(limpo);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  function formatarMoeda(valor) {
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    });
+  }
+
+  function hojeISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  // ---------- DADOS / LOCALSTORAGE ----------
+  const STORAGE_KEY = "crm_propostas_roldao";
+
+  function carregarPropostas() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const data = JSON.parse(raw);
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function salvarPropostas() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(propostas));
+  }
+
+  let propostas = carregarPropostas();
+
+  // se estiver vazio, cria um exemplo
+  if (propostas.length === 0) {
+    propostas = [
+      {
+        id: 1,
+        cliente: "Academia Corpo Ativo",
+        parceiro: "Eng. Diogo",
+        servico: "Projeto elétrico + CFTV",
+        valor: 5500,
+        status: "Aberta",
+        dataEntrada: hojeISO(),
+        prazo: hojeISO(),
+      },
+    ];
+    salvarPropostas();
+  }
+
+  // ---------- KPIs ----------
+  function atualizarKpis(lista) {
+    const total = lista.length;
+    const abertas = lista.filter((p) => p.status === "Aberta").length;
+    const ganhas = lista.filter((p) => p.status === "Ganha").length;
+    const perdidas = lista.filter((p) =>
+      p.status.startsWith("Perdida")
+    ).length;
+
+    const hoje = new Date().toISOString().slice(0, 10);
+    const atrasadas = lista.filter(
+      (p) =>
+        p.status === "Aberta" &&
+        p.prazo &&
+        p.prazo < hoje
+    ).length;
+
+    const valorAberto = lista
+      .filter((p) => p.status === "Aberta")
+      .reduce((acc, p) => acc + (p.valor || 0), 0);
+
+    document.getElementById("kpi-total").textContent = total;
+    document.getElementById("kpi-abertas").textContent = abertas;
+    document.getElementById("kpi-ganhas").textContent = ganhas;
+    document.getElementById("kpi-atrasadas").textContent = atrasadas;
+    document.getElementById("kpi-valor-aberto").textContent =
+      formatarMoeda(valorAberto);
+
+    const pill = document.getElementById("pill-atrasadas");
+    pill.classList.remove("ok", "bad");
+    if (atrasadas === 0) {
+      pill.textContent = "ok";
+      pill.classList.add("ok");
+    } else {
+      pill.textContent = `${atrasadas} atrasada(s)`;
+      pill.classList.add("bad");
+    }
+  }
+
+  // ---------- TABELA ----------
+  function linhaStatusTag(status, prazo) {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const atrasada = status === "Aberta" && prazo && prazo < hoje;
+
+    let classe = "tag-aberta";
+    if (status === "Ganha") classe = "tag-ganha";
+    if (status.startsWith("Perdida")) classe = "tag-perdida";
+    if (atrasada) classe = "tag-atrasada";
+
+    return `<span class="tag-status ${classe}">${status}</span>`;
+  }
+
+  function atualizarTabela(lista) {
+    const tbody = document.getElementById("tabela-propostas");
+    if (lista.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="7" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = lista
+      .map((p) => {
+        return `
+          <tr>
+            <td>${p.cliente || ""}</td>
+            <td>${p.parceiro || ""}</td>
+            <td>${p.servico || ""}</td>
+            <td>${formatarMoeda(p.valor || 0)}</td>
+            <td>${linhaStatusTag(p.status, p.prazo)}</td>
+            <td>${p.dataEntrada || ""}</td>
+            <td>${p.prazo || ""}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  // ---------- GRÁFICO (CORRIGIDO) ----------
+  let chartValores = null;
+
+  function somarValoresPorStatus(lista) {
+    const soma = {
+      abertas: 0,
+      ganhas: 0,
+      perdidas: 0,
+    };
+
+    lista.forEach((p) => {
+      const valor = parseValor(p.valor);
+      if (p.status === "Aberta") soma.abertas += valor;
+      else if (p.status === "Ganha") soma.ganhas += valor;
+      else if (p.status.startsWith("Perdida")) soma.perdidas += valor;
+    });
+
+    return soma;
+  }
+
+  function atualizarGrafico(lista) {
+    const soma = somarValoresPorStatus(lista);
+    const labels = ["Abertas", "Ganhas", "Perdidas/Canceladas"];
+    const dados = [soma.abertas, soma.ganhas, soma.perdidas];
+
+    // garante que nunca teremos Infinity / NaN
+    const maiorValor = Math.max(...dados, 0);
+    const suggestedMax = maiorValor > 0 ? maiorValor * 1.1 : 1;
+
+    if (!chartValores) {
+      const ctx = document
+        .getElementById("chart-valores")
+        .getContext("2d");
+
+      chartValores = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Valores das Propostas (R$)",
+              data: dados,
+              borderWidth: 1,
+              backgroundColor: [
+                "rgba(59, 130, 246, 0.6)",
+                "rgba(34, 197, 94, 0.7)",
+                "rgba(239, 68, 68, 0.7)",
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              grid: {
+                color: "rgba(30, 64, 175, 0.25)",
+              },
+              ticks: {
+                color: "#9ca3af",
+              },
+            },
+            y: {
+              beginAtZero: true,
+              suggestedMax,
+              grid: {
+                color: "rgba(30, 64, 175, 0.25)",
+              },
+              ticks: {
+                color: "#9ca3af",
+                callback(value) {
+                  return "R$ " + value.toLocaleString("pt-BR");
+                },
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              callbacks: {
+                label(context) {
+                  const v = context.parsed.y || 0;
+                  return "R$ " + v.toLocaleString("pt-BR");
+                },
+              },
+            },
+          },
+        },
+      });
+    } else {
+      chartValores.data.labels = labels;
+      chartValores.data.datasets[0].data = dados;
+      chartValores.options.scales.y.suggestedMax = suggestedMax;
+      chartValores.update();
+    }
+  }
+
+  // ---------- FILTROS ----------
+  const inputBusca = document.getElementById("filtro-busca");
+  const selectEtapa = document.getElementById("filtro-etapa");
+  const selectOrdenar = document.getElementById("filtro-ordenar");
+  const infoFiltros = document.getElementById("info-filtros");
+
+  function aplicarFiltros() {
+    const busca = inputBusca.value.trim().toLowerCase();
+    const etapa = selectEtapa.value;
+    const ordenar = selectOrdenar.value;
+
+    let lista = [...propostas];
+
+    if (busca) {
+      lista = lista.filter((p) => {
+        const texto = `
+          ${p.cliente || ""} 
+          ${p.parceiro || ""} 
+          ${p.servico || ""} 
+        `.toLowerCase();
+        return texto.includes(busca);
+      });
+    }
+
+    if (etapa !== "todas") {
+      lista = lista.filter((p) => {
+        if (etapa === "aberta") return p.status === "Aberta";
+        if (etapa === "ganha") return p.status === "Ganha";
+        if (etapa === "perdida") return p.status.startsWith("Perdida");
+        return true;
+      });
+    }
+
+    // ordenação
+    lista.sort((a, b) => {
+      if (ordenar === "recentes") {
+        return (b.dataEntrada || "").localeCompare(a.dataEntrada || "");
+      }
+      if (ordenar === "antigas") {
+        return (a.dataEntrada || "").localeCompare(b.dataEntrada || "");
+      }
+      if (ordenar === "maior-valor") {
+        return parseValor(b.valor) - parseValor(a.valor);
+      }
+      if (ordenar === "menor-valor") {
+        return parseValor(a.valor) - parseValor(b.valor);
+      }
+      return 0;
+    });
+
+    // info texto
+    const partes = [];
+    if (busca) partes.push(`Buscando por: "${busca}"`);
+    if (etapa !== "todas") {
+      const mapa = {
+        aberta: "Abertas",
+        ganha: "Ganhas",
+        perdida: "Perdidas/Canceladas",
+      };
+      partes.push(`Etapa: ${mapa[etapa] || ""}`);
+    }
+    if (ordenar === "recentes") partes.push("Ordenado: mais recentes");
+    if (ordenar === "antigas") partes.push("Ordenado: mais antigas");
+    if (ordenar === "maior-valor") partes.push("Ordenado: maior valor");
+    if (ordenar === "menor-valor") partes.push("Ordenado: menor valor");
+
+    infoFiltros.innerHTML =
+      partes.length === 0
+        ? `<span>Sem filtros adicionais. Listando todas as propostas.</span>`
+        : partes.map((p) => `<span>${p}</span>`).join("");
+
+    atualizarKpis(lista);
+    atualizarTabela(lista);
+    atualizarGrafico(lista);
+  }
+
+  inputBusca.addEventListener("input", aplicarFiltros);
+  selectEtapa.addEventListener("change", aplicarFiltros);
+  selectOrdenar.addEventListener("change", aplicarFiltros);
+
+  // ---------- MODAL NOVA PROPOSTA ----------
+  const modalBackdrop = document.getElementById("modal-backdrop");
+  const btnNova = document.getElementById("btn-nova");
+  const btnFecharModal = document.getElementById("btn-fechar-modal");
+  const btnCancelarModal = document.getElementById("btn-cancelar-modal");
+  const btnSalvarModal = document.getElementById("btn-salvar-modal");
+
+  function abrirModal() {
+    modalBackdrop.style.display = "flex";
+    document.getElementById("novo-cliente").focus();
+  }
+
+  function fecharModal() {
+    modalBackdrop.style.display = "none";
+  }
+
+  btnNova.addEventListener("click", abrirModal);
+  btnFecharModal.addEventListener("click", fecharModal);
+  btnCancelarModal.addEventListener("click", fecharModal);
+
+  modalBackdrop.addEventListener("click", (e) => {
+    if (e.target === modalBackdrop) fecharModal();
+  });
+
+  btnSalvarModal.addEventListener("click", () => {
+    const cliente = document.getElementById("novo-cliente").value.trim();
+    const parceiro = document.getElementById("novo-parceiro").value.trim();
+    const servico = document.getElementById("novo-servico").value.trim();
+    const valorStr = document.getElementById("novo-valor").value.trim();
+    const status = document.getElementById("novo-status").value;
+    const dataEntrada =
+      document.getElementById("novo-data-entrada").value || hojeISO();
+    const prazo = document.getElementById("novo-prazo").value;
+
+    if (!cliente) {
+      alert("Informe o nome do cliente.");
+      return;
+    }
+
+    const valor = parseValor(valorStr);
+
+    const novo = {
+      id: Date.now(),
+      cliente,
+      parceiro,
+      servico,
+      valor,
+      status,
+      dataEntrada,
+      prazo,
+    };
+
+    propostas.push(novo);
+    salvarPropostas();
+
+    // limpa campos
+    document.getElementById("novo-cliente").value = "";
+    document.getElementById("novo-parceiro").value = "";
+    document.getElementById("novo-servico").value = "";
+    document.getElementById("novo-valor").value = "";
+    document.getElementById("novo-status").value = "Aberta";
+    document.getElementById("novo-data-entrada").value = "";
+    document.getElementById("novo-prazo").value = "";
+
+    fecharModal();
+    aplicarFiltros();
+  });
+
+  // ---------- EXPORTAR / IMPORTAR ----------
+  document.getElementById("btn-exportar").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(propostas, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "propostas-crm.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("btn-importar").addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (Array.isArray(data)) {
+            // normaliza os valores
+            propostas = data.map((p) => ({
+              ...p,
+              valor: parseValor(p.valor),
+            }));
+            salvarPropostas();
+            aplicarFiltros();
+          } else {
+            alert("Arquivo inválido.");
+          }
+        } catch {
+          alert("Não foi possível ler o arquivo.");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+
+  // ---------- INICIALIZA ----------
+  aplicarFiltros();
+</script>
 </body>
 </html>
