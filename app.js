@@ -84,6 +84,8 @@ function seedIfEmpty() {
       contact: "65 9xxxx-xxxx",
       service: "Projeto Elétrico / Medição Agrupada",
       city: "Cuiabá/MT",
+      partner: "Parceiro Exemplo",
+      entry: todayISO(),
       value: 5500,
       due: "",
       stage: "PROPOSTA ENVIADA",
@@ -111,6 +113,7 @@ function openModal(editItem = null) {
     els.form.reset();
     els.form.elements.stage.value = "LEAD RECEBIDO";
     els.form.elements.status.value = "ABERTA";
+    els.form.elements.entry.value = todayISO();
     return;
   }
 
@@ -122,6 +125,8 @@ function openModal(editItem = null) {
   els.form.elements.contact.value = editItem.contact || "";
   els.form.elements.service.value = editItem.service || "";
   els.form.elements.city.value = editItem.city || "";
+  els.form.elements.entry.value = editItem.entry || todayISO();
+  els.form.elements.partner.value = editItem.partner || "";
   els.form.elements.value.value = (editItem.value ?? "").toString();
   els.form.elements.due.value = editItem.due || "";
   els.form.elements.stage.value = editItem.stage || STAGES[0];
@@ -158,7 +163,7 @@ function filtered() {
 
   if (q) {
     arr = arr.filter(it =>
-      [it.client, it.service, it.city, it.contact, it.notes]
+      [it.client, it.partner, it.service, it.city, it.contact, it.notes]
         .filter(Boolean).join(" ").toLowerCase().includes(q)
     );
   }
@@ -232,11 +237,15 @@ function renderTable() {
   els.count.textContent = `${arr.length} item(ns)`;
 
   els.rows.innerHTML = arr.map(it => {
+    const entry = it.entry ? it.entry.split("-").reverse().join("/") : "-";
     const due = it.due ? it.due.split("-").reverse().join("/") : "-";
+
     return `
       <div class="row">
         <div>${stagePill(it.stage)}</div>
+        <div class="ellipsis" title="${entry}">${entry}</div>
         <div class="ellipsis" title="${it.client || ""}">${it.client || "-"}</div>
+        <div class="ellipsis" title="${it.partner || ""}">${it.partner || "-"}</div>
         <div class="ellipsis" title="${it.service || ""}">${it.service || "-"}</div>
         <div class="ellipsis" title="${it.city || ""}">${it.city || "-"}</div>
         <div class="money">${formatBRL(it.value || 0)}</div>
@@ -259,7 +268,14 @@ function renderTable() {
 
       if (act === "edit") openModal(item);
       if (act === "dup") {
-        const copy = { ...item, id: uid(), createdAt: Date.now(), updatedAt: Date.now(), status: "ABERTA" };
+        const copy = {
+          ...item,
+          id: uid(),
+          entry: todayISO(),
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          status: "ABERTA"
+        };
         state.items.unshift(copy);
         save();
         render();
@@ -275,6 +291,8 @@ function upsertFromForm() {
     contact: f.contact.value.trim(),
     service: f.service.value.trim(),
     city: f.city.value.trim(),
+    entry: f.entry.value || todayISO(),
+    partner: f.partner.value.trim(),
     value: parseMoney(f.value.value),
     due: f.due.value || "",
     stage: f.stage.value,
@@ -285,6 +303,11 @@ function upsertFromForm() {
 
   if (!payload.client || !payload.service) {
     alert("Preencha Cliente e Serviço.");
+    return;
+  }
+
+  if (!payload.entry) {
+    alert("Preencha a data de entrada.");
     return;
   }
 
@@ -343,7 +366,12 @@ function importJSON(file) {
 
       const map = new Map(state.items.map(i => [i.id, i]));
       for (const it of incoming) {
-        if (it && it.id) map.set(it.id, it);
+        if (it && it.id) {
+          // compat: se não tiver entry, define hoje
+          if (!it.entry) it.entry = todayISO();
+          if (!it.partner) it.partner = "";
+          map.set(it.id, it);
+        }
       }
       state.items = Array.from(map.values()).sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
 
