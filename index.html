@@ -89,4 +89,69 @@
 
       <form id="form">
         <div class="grid">
-          <label class="field
+          <label class="field">
+            <span>Cliente *</span>
+            <input class="input" name="client" required maxlength="80" />
+          </label>
+
+          <label class="field">
+            <span>Contato (opcional)</span>
+            <input class="input" name="contact" maxlength="80" placeholder="WhatsApp / e-mail" />
+          </label>
+
+          <label class="field">
+            <span>Serviço *</span>
+            <input class="input" name="service" required maxlength="80" placeholder="Elétrico, SPDA, CFTV..." />
+          </label>
+
+          <label class="field">
+            <span>Cidade/UF</span>
+            <input class="input" name="city" maxlength="40" placeholder="Cuiabá/MT" />
+          </label>
+
+          <label class="field">
+            <span>Valor (R$)</span>
+            <input class="input" name="value" inputmode="decimal" placeholder="7300" />
+          </label>
+
+          <label class="field">
+            <span>Prazo de resposta/entrega</span>
+            <input class="input" type="date" name="due" />
+          </label>
+
+          <label class="field">
+            <span>Etapa *</span>
+            <select class="input" name="stage" required></select>
+          </label>
+
+          <label class="field">
+            <span>Status *</span>
+            <select class="input" name="status" required>
+              <option value="ABERTA">ABERTA</option>
+              <option value="GANHA">GANHA</option>
+              <option value="PERDIDA">PERDIDA</option>
+              <option value="CANCELADA">CANCELADA</option>
+            </select>
+          </label>
+
+          <label class="field span2">
+            <span>Observações</span>
+            <textarea class="input" name="notes" rows="3" maxlength="600" placeholder="Escopo, pendências, docs, etc."></textarea>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="btnDelete" class="btn danger hidden">Excluir</button>
+          <div class="spacer"></div>
+          <button type="button" id="btnCancel" class="btn">Cancelar</button>
+          <button type="submit" class="btn primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
