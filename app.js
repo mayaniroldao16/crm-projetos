@@ -250,7 +250,6 @@ function renderTable() {
     `;
   }).join("");
 
-  // Delegação de eventos
   els.rows.querySelectorAll("button[data-act]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
@@ -342,7 +341,6 @@ function importJSON(file) {
       const incoming = Array.isArray(parsed) ? parsed : parsed.items;
       if (!Array.isArray(incoming)) throw new Error("Formato inválido");
 
-      // merge simples (por id), prioriza incoming
       const map = new Map(state.items.map(i => [i.id, i]));
       for (const it of incoming) {
         if (it && it.id) map.set(it.id, it);
@@ -361,9 +359,80 @@ function importJSON(file) {
   reader.readAsText(file);
 }
 
+/* ===== GRÁFICO EM BARRAS (Chart.js) ===== */
+let chartValores = null;
+
+function getValoresResumo() {
+  const ganhos = state.items
+    .filter(i => i.status === "GANHA")
+    .reduce((s, i) => s + (i.value || 0), 0);
+
+  const perdidosCancelados = state.items
+    .filter(i => i.status === "PERDIDA" || i.status === "CANCELADA")
+    .reduce((s, i) => s + (i.value || 0), 0);
+
+  const abertos = state.items
+    .filter(i => i.status === "ABERTA")
+    .reduce((s, i) => s + (i.value || 0), 0);
+
+  return { ganhos, perdidosCancelados, abertos };
+}
+
+function renderGraficoValores() {
+  const canvas = document.getElementById("barValores");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const { ganhos, perdidosCancelados, abertos } = getValoresResumo();
+
+  if (chartValores) chartValores.destroy();
+
+  chartValores = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: ["Ganhas", "Perdidas/Canceladas", "Em aberto"],
+      datasets: [{
+        label: "Valor (R$)",
+        data: [ganhos, perdidosCancelados, abertos],
+        backgroundColor: [
+          "rgba(85, 210, 122, 0.70)",
+          "rgba(255, 110, 110, 0.70)",
+          "rgba(110, 168, 255, 0.70)"
+        ],
+        borderRadius: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.raw.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          },
+          grid: { color: "rgba(255,255,255,0.06)" }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+/* ======================================= */
+
 function render() {
   renderStats();
   renderTable();
+  renderGraficoValores();
 }
 
 function bind() {
@@ -382,8 +451,8 @@ function bind() {
   els.btnDelete.addEventListener("click", deleteCurrent);
 
   [els.q, els.stageFilter, els.sort].forEach(el => {
-    el.addEventListener("input", renderTable);
-    el.addEventListener("change", renderTable);
+    el.addEventListener("input", () => { renderTable(); renderGraficoValores(); });
+    el.addEventListener("change", () => { renderTable(); renderGraficoValores(); });
   });
 
   els.btnExport.addEventListener("click", exportJSON);
@@ -393,7 +462,6 @@ function bind() {
     if (file) importJSON(file);
   });
 
-  // Popular select de etapa no filtro
   stageOptions();
 }
 
