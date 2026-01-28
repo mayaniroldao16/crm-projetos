@@ -282,10 +282,6 @@
 
     /* ÁREA DO GRÁFICO */
 
-    .card-chart {
-      margin-top: 0;
-    }
-
     .card-chart-body {
       height: 260px;
       position: relative;
@@ -560,9 +556,9 @@
     </section>
   </div>
 
-  <!-- GRÁFICO -->
+  <!-- GRÁFICO EM PIZZA -->
   <section class="card card-chart">
-    <div class="card-title">Valores das Propostas (R$)</div>
+    <div class="card-title">Distribuição dos valores por status</div>
     <div class="card-chart-body">
       <canvas id="chart-valores"></canvas>
     </div>
@@ -787,7 +783,7 @@
       .join("");
   }
 
-  // ---------- GRÁFICO (CORRIGIDO) ----------
+  // ---------- GRÁFICO EM PIZZA ----------
   let chartValores = null;
 
   function somarValoresPorStatus(lista) {
@@ -812,9 +808,18 @@
     const labels = ["Abertas", "Ganhas", "Perdidas/Canceladas"];
     const dados = [soma.abertas, soma.ganhas, soma.perdidas];
 
-    // garante que nunca teremos Infinity / NaN
-    const maiorValor = Math.max(...dados, 0);
-    const suggestedMax = maiorValor > 0 ? maiorValor * 1.1 : 1;
+    // se tudo for zero, mostra uma fatia única "Sem valores"
+    const todosZero = dados.every((v) => v === 0);
+    const dataLabels = todosZero ? ["Sem valores"] : labels;
+    const dataValues = todosZero ? [1] : dados;
+
+    const cores = todosZero
+      ? ["rgba(148, 163, 184, 0.7)"]
+      : [
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(34, 197, 94, 0.85)",
+          "rgba(239, 68, 68, 0.85)",
+        ];
 
     if (!chartValores) {
       const ctx = document
@@ -822,57 +827,37 @@
         .getContext("2d");
 
       chartValores = new Chart(ctx, {
-        type: "bar",
+        type: "pie",
         data: {
-          labels,
+          labels: dataLabels,
           datasets: [
             {
-              label: "Valores das Propostas (R$)",
-              data: dados,
+              data: dataValues,
+              backgroundColor: cores,
               borderWidth: 1,
-              backgroundColor: [
-                "rgba(59, 130, 246, 0.6)",
-                "rgba(34, 197, 94, 0.7)",
-                "rgba(239, 68, 68, 0.7)",
-              ],
             },
           ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          scales: {
-            x: {
-              grid: {
-                color: "rgba(30, 64, 175, 0.25)",
-              },
-              ticks: {
-                color: "#9ca3af",
-              },
-            },
-            y: {
-              beginAtZero: true,
-              suggestedMax,
-              grid: {
-                color: "rgba(30, 64, 175, 0.25)",
-              },
-              ticks: {
-                color: "#9ca3af",
-                callback(value) {
-                  return "R$ " + value.toLocaleString("pt-BR");
-                },
-              },
-            },
-          },
           plugins: {
             legend: {
-              display: false,
+              position: "bottom",
+              labels: {
+                color: "#e5e7eb",
+                font: {
+                  size: 11,
+                },
+              },
             },
             tooltip: {
               callbacks: {
                 label(context) {
-                  const v = context.parsed.y || 0;
-                  return "R$ " + v.toLocaleString("pt-BR");
+                  if (todosZero) return "Sem valores";
+                  const label = context.label || "";
+                  const v = context.parsed || 0;
+                  return `${label}: ${formatarMoeda(v)}`;
                 },
               },
             },
@@ -880,9 +865,9 @@
         },
       });
     } else {
-      chartValores.data.labels = labels;
-      chartValores.data.datasets[0].data = dados;
-      chartValores.options.scales.y.suggestedMax = suggestedMax;
+      chartValores.data.labels = dataLabels;
+      chartValores.data.datasets[0].data = dataValues;
+      chartValores.data.datasets[0].backgroundColor = cores;
       chartValores.update();
     }
   }
@@ -1060,7 +1045,6 @@
         try {
           const data = JSON.parse(ev.target.result);
           if (Array.isArray(data)) {
-            // normaliza os valores
             propostas = data.map((p) => ({
               ...p,
               valor: parseValor(p.valor),
