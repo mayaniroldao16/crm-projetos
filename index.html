@@ -345,7 +345,21 @@
       color: #facc15;
     }
 
-    /* MODAL NOVA PROPOSTA */
+    .btn-table {
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 0.7rem;
+      padding: 0.18rem 0.55rem;
+      cursor: pointer;
+    }
+
+    .btn-table:hover {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    /* MODAL NOVA/EDITAR PROPOSTA */
 
     .modal-backdrop {
       position: fixed;
@@ -578,6 +592,7 @@
           <th>Status</th>
           <th>Entrada</th>
           <th>Prazo</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody id="tabela-propostas">
@@ -587,11 +602,11 @@
   </section>
 </div>
 
-<!-- MODAL NOVA PROPOSTA -->
+<!-- MODAL NOVA/EDITAR PROPOSTA -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <div class="modal-header">
-      <h2>Nova proposta</h2>
+      <h2 id="modal-titulo">Nova proposta</h2>
       <button class="btn-ghost btn-sm" id="btn-fechar-modal">✕</button>
     </div>
     <div class="modal-body">
@@ -762,7 +777,7 @@
     const tbody = document.getElementById("tabela-propostas");
     if (lista.length === 0) {
       tbody.innerHTML =
-        '<tr><td colspan="7" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
+        '<tr><td colspan="8" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
       return;
     }
 
@@ -777,10 +792,21 @@
             <td>${linhaStatusTag(p.status, p.prazo)}</td>
             <td>${p.dataEntrada || ""}</td>
             <td>${p.prazo || ""}</td>
+            <td>
+              <button class="btn-table btn-editar" data-id="${p.id}">Editar</button>
+            </td>
           </tr>
         `;
       })
       .join("");
+
+    // adiciona eventos de editar
+    document.querySelectorAll(".btn-editar").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+        abrirModalEditar(id);
+      });
+    });
   }
 
   // ---------- GRÁFICO EM PIZZA ----------
@@ -808,7 +834,6 @@
     const labels = ["Abertas", "Ganhas", "Perdidas/Canceladas"];
     const dados = [soma.abertas, soma.ganhas, soma.perdidas];
 
-    // se tudo for zero, mostra uma fatia única "Sem valores"
     const todosZero = dados.every((v) => v === 0);
     const dataLabels = todosZero ? ["Sem valores"] : labels;
     const dataValues = todosZero ? [1] : dados;
@@ -952,23 +977,62 @@
   selectEtapa.addEventListener("change", aplicarFiltros);
   selectOrdenar.addEventListener("change", aplicarFiltros);
 
-  // ---------- MODAL NOVA PROPOSTA ----------
+  // ---------- MODAL NOVA/EDITAR PROPOSTA ----------
   const modalBackdrop = document.getElementById("modal-backdrop");
   const btnNova = document.getElementById("btn-nova");
   const btnFecharModal = document.getElementById("btn-fechar-modal");
   const btnCancelarModal = document.getElementById("btn-cancelar-modal");
   const btnSalvarModal = document.getElementById("btn-salvar-modal");
+  const modalTitulo = document.getElementById("modal-titulo");
 
-  function abrirModal() {
+  let editingId = null; // null = nova; número = editar
+
+  function limparCamposModal() {
+    document.getElementById("novo-cliente").value = "";
+    document.getElementById("novo-parceiro").value = "";
+    document.getElementById("novo-servico").value = "";
+    document.getElementById("novo-valor").value = "";
+    document.getElementById("novo-status").value = "Aberta";
+    document.getElementById("novo-data-entrada").value = "";
+    document.getElementById("novo-prazo").value = "";
+  }
+
+  function abrirModalNovo() {
+    editingId = null;
+    modalTitulo.textContent = "Nova proposta";
+    btnSalvarModal.textContent = "Salvar";
+    limparCamposModal();
     modalBackdrop.style.display = "flex";
     document.getElementById("novo-cliente").focus();
   }
 
-  function fecharModal() {
-    modalBackdrop.style.display = "none";
+  function abrirModalEditar(id) {
+    const proposta = propostas.find((p) => p.id === id);
+    if (!proposta) return;
+
+    editingId = id;
+    modalTitulo.textContent = "Editar proposta";
+    btnSalvarModal.textContent = "Atualizar";
+
+    document.getElementById("novo-cliente").value = proposta.cliente || "";
+    document.getElementById("novo-parceiro").value = proposta.parceiro || "";
+    document.getElementById("novo-servico").value = proposta.servico || "";
+    document.getElementById("novo-valor").value =
+      proposta.valor != null ? proposta.valor.toString().replace(".", ",") : "";
+    document.getElementById("novo-status").value = proposta.status || "Aberta";
+    document.getElementById("novo-data-entrada").value =
+      proposta.dataEntrada || "";
+    document.getElementById("novo-prazo").value = proposta.prazo || "";
+
+    modalBackdrop.style.display = "flex";
   }
 
-  btnNova.addEventListener("click", abrirModal);
+  function fecharModal() {
+    modalBackdrop.style.display = "none";
+    editingId = null;
+  }
+
+  btnNova.addEventListener("click", abrirModalNovo);
   btnFecharModal.addEventListener("click", fecharModal);
   btnCancelarModal.addEventListener("click", fecharModal);
 
@@ -993,29 +1057,37 @@
 
     const valor = parseValor(valorStr);
 
-    const novo = {
-      id: Date.now(),
-      cliente,
-      parceiro,
-      servico,
-      valor,
-      status,
-      dataEntrada,
-      prazo,
-    };
+    if (editingId === null) {
+      // nova proposta
+      const novo = {
+        id: Date.now(),
+        cliente,
+        parceiro,
+        servico,
+        valor,
+        status,
+        dataEntrada,
+        prazo,
+      };
+      propostas.push(novo);
+    } else {
+      // edição
+      const idx = propostas.findIndex((p) => p.id === editingId);
+      if (idx !== -1) {
+        propostas[idx] = {
+          ...propostas[idx],
+          cliente,
+          parceiro,
+          servico,
+          valor,
+          status,
+          dataEntrada,
+          prazo,
+        };
+      }
+    }
 
-    propostas.push(novo);
     salvarPropostas();
-
-    // limpa campos
-    document.getElementById("novo-cliente").value = "";
-    document.getElementById("novo-parceiro").value = "";
-    document.getElementById("novo-servico").value = "";
-    document.getElementById("novo-valor").value = "";
-    document.getElementById("novo-status").value = "Aberta";
-    document.getElementById("novo-data-entrada").value = "";
-    document.getElementById("novo-prazo").value = "";
-
     fecharModal();
     aplicarFiltros();
   });
