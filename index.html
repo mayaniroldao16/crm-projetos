@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CRM Projetos — Mayani</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="logo">MR</div>
+      <div>
+        <h1>CRM de Propostas</h1>
+        <p class="muted">Simples • Local • GitHub Pages</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btnNew" class="btn primary">+ Nova proposta</button>
+      <button id="btnExport" class="btn">Exportar</button>
+      <label class="btn file">
+        Importar
+        <input id="fileImport" type="file" accept="application/json" />
+      </label>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="cards">
+      <div class="card">
+        <div class="card-title">Visão geral</div>
+        <div class="stats" id="stats"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Filtros</div>
+        <div class="filters">
+          <input id="q" class="input" placeholder="Buscar por cliente, serviço, cidade..." />
+          <select id="stage" class="input"></select>
+          <select id="sort" class="input">
+            <option value="updated_desc">Mais recentes</option>
+            <option value="due_asc">Prazo mais próximo</option>
+            <option value="value_desc">Maior valor</option>
+            <option value="client_asc">Cliente A-Z</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="table-head">
+        <div class="card-title">Propostas</div>
+        <div class="muted" id="count"></div>
+      </div>
+
+      <div class="table">
+        <div class="row head">
+          <div>Etapa</div>
+          <div>Cliente</div>
+          <div>Serviço</div>
+          <div>Cidade</div>
+          <div>Valor</div>
+          <div>Prazo</div>
+          <div>Status</div>
+          <div>Ações</div>
+        </div>
+        <div id="rows"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2 id="modalTitle">Nova proposta</h2>
+        <button class="icon" id="btnClose" title="Fechar">✕</button>
+      </div>
+
+      <form id="form">
+        <div class="grid">
+          <label class="field">
+            <span>Cliente *</span>
+            <input class="input" name="client" required maxlength="80" />
+          </label>
+
+          <label class="field">
+            <span>Contato (opcional)</span>
+            <input class="input" name="contact" maxlength="80" placeholder="WhatsApp / e-mail" />
+          </label>
+
+          <label class="field">
+            <span>Serviço *</span>
+            <input class="input" name="service" required maxlength="80" placeholder="Elétrico, SPDA, CFTV..." />
+          </label>
+
+          <label class="field">
+            <span>Cidade/UF</span>
+            <input class="input" name="city" maxlength="40" placeholder="Cuiabá/MT" />
+          </label>
+
+          <label class="field">
+            <span>Valor (R$)</span>
+            <input class="input" name="value" inputmode="decimal" placeholder="7300" />
+          </label>
+
+          <label class="field">
+            <span>Prazo de resposta/entrega</span>
+            <input class="input" type="date" name="due" />
+          </label>
+
+          <label class="field">
+            <span>Etapa *</span>
+            <select class="input" name="stage" required></select>
+          </label>
+
+          <label class="field">
+            <span>Status *</span>
+            <select class="input" name="status" required>
+              <option value="ABERTA">ABERTA</option>
+              <option value="GANHA">GANHA</option>
+              <option value="PERDIDA">PERDIDA</option>
+              <option value="CANCELADA">CANCELADA</option>
+            </select>
+          </label>
+
+          <label class="field span2">
+            <span>Observações</span>
+            <textarea class="input" name="notes" rows="3" maxlength="600" placeholder="Escopo, pendências, docs, etc."></textarea>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="btnDelete" class="btn danger hidden">Excluir</button>
+          <div class="spacer"></div>
+          <button type="button" id="btnCancel" class="btn">Cancelar</button>
+          <button type="submit" class="btn primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
