@@ -36,7 +36,7 @@
       <div class="card">
         <div class="card-title">Filtros</div>
         <div class="filters">
-          <input id="q" class="input" placeholder="Buscar por cliente, serviço, cidade..." />
+          <input id="q" class="input" placeholder="Buscar por cliente, parceiro, serviço, cidade..." />
           <select id="stage" class="input"></select>
           <select id="sort" class="input">
             <option value="updated_desc">Mais recentes</option>
@@ -48,7 +48,7 @@
       </div>
     </section>
 
-    <!-- NOVO: Gráfico em barras -->
+    <!-- Gráfico em barras -->
     <section class="card chart-card">
       <div class="card-title">Valores das Propostas (R$)</div>
       <div class="muted" style="margin-top:-6px;margin-bottom:10px;">
@@ -66,7 +66,9 @@
       <div class="table">
         <div class="row head">
           <div>Etapa</div>
+          <div>Entrada</div>
           <div>Cliente</div>
+          <div>Parceiro</div>
           <div>Serviço</div>
           <div>Cidade</div>
           <div>Valor</div>
@@ -110,6 +112,16 @@
           </label>
 
           <label class="field">
+            <span>Data de entrada *</span>
+            <input class="input" type="date" name="entry" required />
+          </label>
+
+          <label class="field">
+            <span>Parceiro</span>
+            <input class="input" name="partner" maxlength="60" placeholder="Nome do parceiro (opcional)" />
+          </label>
+
+          <label class="field">
             <span>Valor (R$)</span>
             <input class="input" name="value" inputmode="decimal" placeholder="7300" />
           </label>
@@ -150,7 +162,7 @@
     </div>
   </div>
 
-  <!-- Chart.js (CDN) -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
