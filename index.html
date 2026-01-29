@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>CRM de Propostas</title>
+  <title>CRM de Propostas – MR Engenharia Elétrica</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,21 +11,25 @@
 
   <style>
     :root {
-      --bg-main: #020712;
-      --bg-elevated: #050b18;
-      --bg-card: #070d1d;
+      /* cores principais inspiradas na logo */
+      --bg-main: #050816;
+      --bg-card: #090e1e;
       --border-soft: 1px solid rgba(255, 255, 255, 0.04);
-      --accent: #4ade80;
-      --accent-strong: #22c55e;
-      --accent-soft: rgba(74, 222, 128, 0.12);
+
+      --accent: #e3b12b;         /* dourado */
+      --accent-strong: #e3b12b;
+      --accent-soft: rgba(227, 177, 43, 0.12);
+
+      --text: #f9fafb;
+      --text-soft: #a1a5b5;
+
       --danger-soft: rgba(248, 113, 113, 0.15);
       --danger: #f97373;
-      --text: #f9fafb;
-      --text-soft: #9ca3af;
+
       --radius-lg: 18px;
       --radius-md: 12px;
       --radius-full: 999px;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.7);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.75);
     }
 
     * {
@@ -36,7 +40,7 @@
 
     body {
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top left, #020617, #020617 60%, #000000 100%);
+      background: radial-gradient(circle at top left, #111827, #020617 55%, #000000 100%);
       color: var(--text);
       min-height: 100vh;
     }
@@ -63,14 +67,45 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1.5rem;
+      gap: 1rem;
     }
 
-    .header-left h1 {
-      font-size: 1.3rem;
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-logo {
+      width: 68px;
+      height: auto;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 0.2rem 0.3rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .brand-title {
+      font-size: 1rem;
       font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f3f4ff;
     }
 
-    .header-left span {
+    .brand-subtitle {
       font-size: 0.8rem;
       color: var(--text-soft);
     }
@@ -83,8 +118,9 @@
       border: 1px solid rgba(148, 163, 184, 0.4);
       padding: 0.12rem 0.7rem;
       font-size: 0.7rem;
-      margin-top: 0.4rem;
       color: var(--text-soft);
+      background: rgba(9, 10, 24, 0.85);
+      width: fit-content;
     }
 
     .badge-dot {
@@ -121,13 +157,13 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-strong), #22c55e);
+      background: linear-gradient(135deg, var(--accent-strong), #facc6b);
       border-color: transparent;
-      color: #022c22;
+      color: #1f2933;
     }
 
     .btn-primary:hover {
-      box-shadow: 0 14px 38px rgba(34, 197, 94, 0.45);
+      box-shadow: 0 14px 38px rgba(227, 177, 43, 0.55);
     }
 
     /* GRID PRINCIPAL */
@@ -164,8 +200,8 @@
 
     .kpi-card {
       border-radius: var(--radius-md);
-      background: #020617;
-      border: 1px solid rgba(30, 64, 175, 0.65);
+      background: #050816;
+      border: 1px solid rgba(227, 177, 43, 0.55);
       padding: 0.6rem 0.7rem;
       font-size: 0.8rem;
     }
@@ -193,7 +229,7 @@
     }
 
     .kpi-pill.ok {
-      background: rgba(22, 163, 74, 0.18);
+      background: rgba(34, 197, 94, 0.15);
       color: #4ade80;
     }
 
@@ -206,7 +242,7 @@
       margin-top: 0.4rem;
       padding: 0.6rem 0.7rem;
       border-radius: var(--radius-md);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(9, 12, 30, 0.95);
       border: 1px solid rgba(148, 163, 184, 0.35);
       display: flex;
       align-items: center;
@@ -247,9 +283,9 @@
 
     .input,
     .select {
-      background: #020617;
+      background: #050816;
       border-radius: var(--radius-full);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.5);
       padding: 0.38rem 0.7rem;
       font-size: 0.8rem;
       color: var(--text);
@@ -274,7 +310,7 @@
     }
 
     .filters-badges span {
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(9, 11, 26, 0.9);
       border-radius: var(--radius-full);
       padding: 0.15rem 0.55rem;
       border: 1px solid rgba(148, 163, 184, 0.25);
@@ -326,13 +362,13 @@
     }
 
     .tag-aberta {
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
+      background: rgba(227, 177, 43, 0.18);
+      color: #facc6b;
     }
 
     .tag-ganha {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
+      background: rgba(71, 85, 105, 0.25);
+      color: #e5e7eb;
     }
 
     .tag-perdida {
@@ -341,7 +377,7 @@
     }
 
     .tag-atrasada {
-      background: rgba(234, 179, 8, 0.15);
+      background: rgba(234, 179, 8, 0.18);
       color: #facc15;
     }
 
@@ -364,7 +400,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(3, 7, 18, 0.9);
       display: none;
       align-items: center;
       justify-content: center;
@@ -374,7 +410,7 @@
     .modal {
       width: 100%;
       max-width: 520px;
-      background: #020617;
+      background: #050816;
       border-radius: var(--radius-lg);
       border: var(--border-soft);
       box-shadow: var(--shadow-soft);
@@ -493,7 +529,6 @@
       .header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.7rem;
       }
 
       .header-actions {
@@ -518,13 +553,19 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
-      <h1>CRM de Propostas</h1>
-      <span>Simples · Local · GitHub Pages</span>
+      <div class="brand">
+        <img src="mr-logo.png" alt="MR Engenharia Elétrica" class="brand-logo">
+        <div class="brand-titles">
+          <div class="brand-title">MR Engenharia Elétrica</div>
+          <div class="brand-subtitle">CRM de Propostas</div>
+        </div>
+      </div>
       <div class="badge">
         <div class="badge-dot"></div>
-        Dados salvos no seu navegador (localStorage)
+        Dados salvos localmente no seu navegador (localStorage)
       </div>
     </div>
+
     <div class="header-actions">
       <button class="btn" id="btn-exportar">Exportar</button>
       <button class="btn" id="btn-importar">Importar</button>
@@ -798,7 +839,6 @@
       if (s.cabeamento) nomes.push("Cabeamento Estruturado");
       return nomes.join(", ") || "-";
     }
-    // compatibilidade com versões antigas
     return p.servico || "-";
   }
 
@@ -909,7 +949,6 @@
       })
       .join("");
 
-    // adiciona eventos de editar
     document.querySelectorAll(".btn-editar").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.dataset.id);
@@ -950,9 +989,9 @@
     const cores = todosZero
       ? ["rgba(148, 163, 184, 0.7)"]
       : [
-          "rgba(59, 130, 246, 0.8)",
-          "rgba(34, 197, 94, 0.85)",
-          "rgba(239, 68, 68, 0.85)",
+          "rgba(227, 177, 43, 0.9)",   // abertas - dourado
+          "rgba(75, 85, 99, 0.9)",     // ganhas - cinza/azul
+          "rgba(239, 68, 68, 0.9)",    // perdidas - vermelho
         ];
 
     if (!chartValores) {
@@ -980,9 +1019,7 @@
               position: "bottom",
               labels: {
                 color: "#e5e7eb",
-                font: {
-                  size: 11,
-                },
+                font: { size: 11 },
               },
             },
             tooltip: {
@@ -1039,7 +1076,6 @@
       });
     }
 
-    // ordenação
     lista.sort((a, b) => {
       if (ordenar === "recentes") {
         return (b.dataEntrada || "").localeCompare(a.dataEntrada || "");
@@ -1056,7 +1092,6 @@
       return 0;
     });
 
-    // info texto
     const partes = [];
     if (busca) partes.push(`Buscando por: "${busca}"`);
     if (etapa !== "todas") {
@@ -1094,7 +1129,7 @@
   const btnSalvarModal = document.getElementById("btn-salvar-modal");
   const modalTitulo = document.getElementById("modal-titulo");
 
-  let editingId = null; // null = nova; número = editar
+  let editingId = null;
 
   function limparCamposModal() {
     document.getElementById("novo-cliente").value = "";
@@ -1138,7 +1173,6 @@
       setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
       setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
     } else {
-      // compat: tudo em baixa tensão
       document.getElementById("chk-servico-bt").checked = true;
       document.getElementById("val-servico-bt").value =
         proposta.valor != null ? proposta.valor.toString().replace(".", ",") : "";
@@ -1198,12 +1232,10 @@
     }
 
     const { baixa, media, cftv, cabeamento, total } = obterServicosDaUI();
-
     const servicosObj = { baixa, media, cftv, cabeamento };
     const valor = total;
 
     if (editingId === null) {
-      // nova proposta
       const novo = {
         id: Date.now(),
         cliente,
@@ -1216,7 +1248,6 @@
       };
       propostas.push(novo);
     } else {
-      // edição
       const idx = propostas.findIndex((p) => p.id === editingId);
       if (idx !== -1) {
         propostas[idx] = {
@@ -1237,7 +1268,6 @@
     aplicarFiltros();
   });
 
-  // listeners para atualizar total quando mexer nos serviços
   ["chk-servico-bt", "chk-servico-mt", "chk-servico-cftv", "chk-servico-cab"].forEach((id) => {
     document.getElementById(id).addEventListener("change", atualizarValorTotalUI);
   });
