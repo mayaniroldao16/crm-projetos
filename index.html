@@ -444,6 +444,39 @@
       background: rgba(15, 23, 42, 0.8);
     }
 
+    /* SERVIÇOS NO MODAL */
+    .servicos-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-top: 0.1rem;
+    }
+
+    .servico-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .servico-row label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+    }
+
+    .servico-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+
+    .servico-row input[type="text"] {
+      max-width: 120px;
+      text-align: right;
+    }
+
     /* RESPONSIVO */
 
     @media (max-width: 900px) {
@@ -587,7 +620,7 @@
         <tr>
           <th>Cliente</th>
           <th>Parceiro</th>
-          <th>Serviço</th>
+          <th>Serviços</th>
           <th>Valor (R$)</th>
           <th>Status</th>
           <th>Entrada</th>
@@ -615,21 +648,49 @@
         <input id="novo-cliente" type="text" required />
       </div>
 
-      <div class="modal-row">
-        <div>
-          <label for="novo-parceiro">Parceiro</label>
-          <input id="novo-parceiro" type="text" />
-        </div>
-        <div>
-          <label for="novo-servico">Serviço</label>
-          <input id="novo-servico" type="text" />
+      <div>
+        <label for="novo-parceiro">Parceiro</label>
+        <input id="novo-parceiro" type="text" />
+      </div>
+
+      <div>
+        <label>Serviços e valores</label>
+        <div class="servicos-grid">
+          <div class="servico-row">
+            <label>
+              <input type="checkbox" id="chk-servico-bt">
+              Elétrico Baixa Tensão
+            </label>
+            <input type="text" id="val-servico-bt" placeholder="0,00" />
+          </div>
+          <div class="servico-row">
+            <label>
+              <input type="checkbox" id="chk-servico-mt">
+              Elétrico Média Tensão
+            </label>
+            <input type="text" id="val-servico-mt" placeholder="0,00" />
+          </div>
+          <div class="servico-row">
+            <label>
+              <input type="checkbox" id="chk-servico-cftv">
+              CFTV
+            </label>
+            <input type="text" id="val-servico-cftv" placeholder="0,00" />
+          </div>
+          <div class="servico-row">
+            <label>
+              <input type="checkbox" id="chk-servico-cab">
+              Cabeamento Estruturado
+            </label>
+            <input type="text" id="val-servico-cab" placeholder="0,00" />
+          </div>
         </div>
       </div>
 
       <div class="modal-row">
         <div>
-          <label for="novo-valor">Valor (R$)</label>
-          <input id="novo-valor" type="text" placeholder="5.500,00" />
+          <label for="novo-valor-total">Valor total (R$)</label>
+          <input id="novo-valor-total" type="text" readonly />
         </div>
         <div>
           <label for="novo-status">Status</label>
@@ -711,7 +772,12 @@
         id: 1,
         cliente: "Academia Corpo Ativo",
         parceiro: "Eng. Diogo",
-        servico: "Projeto elétrico + CFTV",
+        servicos: {
+          baixa: 3000,
+          media: 0,
+          cftv: 2500,
+          cabeamento: 0,
+        },
         valor: 5500,
         status: "Aberta",
         dataEntrada: hojeISO(),
@@ -719,6 +785,49 @@
       },
     ];
     salvarPropostas();
+  }
+
+  // ---------- SERVIÇOS ----------
+  function descricaoServicos(p) {
+    if (p.servicos) {
+      const s = p.servicos;
+      const nomes = [];
+      if (s.baixa) nomes.push("Elétrico Baixa Tensão");
+      if (s.media) nomes.push("Elétrico Média Tensão");
+      if (s.cftv) nomes.push("CFTV");
+      if (s.cabeamento) nomes.push("Cabeamento Estruturado");
+      return nomes.join(", ") || "-";
+    }
+    // compatibilidade com versões antigas
+    return p.servico || "-";
+  }
+
+  function obterServicosDaUI() {
+    const chkBt   = document.getElementById("chk-servico-bt").checked;
+    const chkMt   = document.getElementById("chk-servico-mt").checked;
+    const chkCftv = document.getElementById("chk-servico-cftv").checked;
+    const chkCab  = document.getElementById("chk-servico-cab").checked;
+
+    const valBt   = chkBt   ? parseValor(document.getElementById("val-servico-bt").value)   : 0;
+    const valMt   = chkMt   ? parseValor(document.getElementById("val-servico-mt").value)   : 0;
+    const valCftv = chkCftv ? parseValor(document.getElementById("val-servico-cftv").value) : 0;
+    const valCab  = chkCab  ? parseValor(document.getElementById("val-servico-cab").value)  : 0;
+
+    const total = valBt + valMt + valCftv + valCab;
+
+    return {
+      baixa: valBt,
+      media: valMt,
+      cftv: valCftv,
+      cabeamento: valCab,
+      total,
+    };
+  }
+
+  function atualizarValorTotalUI() {
+    const { total } = obterServicosDaUI();
+    const inputTotal = document.getElementById("novo-valor-total");
+    inputTotal.value = total ? total.toString().replace(".", ",") : "";
   }
 
   // ---------- KPIs ----------
@@ -787,7 +896,7 @@
           <tr>
             <td>${p.cliente || ""}</td>
             <td>${p.parceiro || ""}</td>
-            <td>${p.servico || ""}</td>
+            <td>${descricaoServicos(p)}</td>
             <td>${formatarMoeda(p.valor || 0)}</td>
             <td>${linhaStatusTag(p.status, p.prazo)}</td>
             <td>${p.dataEntrada || ""}</td>
@@ -915,7 +1024,7 @@
         const texto = `
           ${p.cliente || ""} 
           ${p.parceiro || ""} 
-          ${p.servico || ""} 
+          ${descricaoServicos(p)} 
         `.toLowerCase();
         return texto.includes(busca);
       });
@@ -990,8 +1099,18 @@
   function limparCamposModal() {
     document.getElementById("novo-cliente").value = "";
     document.getElementById("novo-parceiro").value = "";
-    document.getElementById("novo-servico").value = "";
-    document.getElementById("novo-valor").value = "";
+
+    document.getElementById("chk-servico-bt").checked = false;
+    document.getElementById("chk-servico-mt").checked = false;
+    document.getElementById("chk-servico-cftv").checked = false;
+    document.getElementById("chk-servico-cab").checked = false;
+
+    document.getElementById("val-servico-bt").value = "";
+    document.getElementById("val-servico-mt").value = "";
+    document.getElementById("val-servico-cftv").value = "";
+    document.getElementById("val-servico-cab").value = "";
+
+    document.getElementById("novo-valor-total").value = "";
     document.getElementById("novo-status").value = "Aberta";
     document.getElementById("novo-data-entrada").value = "";
     document.getElementById("novo-prazo").value = "";
@@ -1006,6 +1125,33 @@
     document.getElementById("novo-cliente").focus();
   }
 
+  function preencherServicosNoModal(proposta) {
+    if (proposta.servicos) {
+      const s = proposta.servicos;
+      const setRow = (chkId, valId, valor) => {
+        const checked = !!valor;
+        document.getElementById(chkId).checked = checked;
+        document.getElementById(valId).value = checked ? valor.toString().replace(".", ",") : "";
+      };
+      setRow("chk-servico-bt", "val-servico-bt", s.baixa || 0);
+      setRow("chk-servico-mt", "val-servico-mt", s.media || 0);
+      setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
+      setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
+    } else {
+      // compat: tudo em baixa tensão
+      document.getElementById("chk-servico-bt").checked = true;
+      document.getElementById("val-servico-bt").value =
+        proposta.valor != null ? proposta.valor.toString().replace(".", ",") : "";
+      document.getElementById("chk-servico-mt").checked = false;
+      document.getElementById("val-servico-mt").value = "";
+      document.getElementById("chk-servico-cftv").checked = false;
+      document.getElementById("val-servico-cftv").value = "";
+      document.getElementById("chk-servico-cab").checked = false;
+      document.getElementById("val-servico-cab").value = "";
+    }
+    atualizarValorTotalUI();
+  }
+
   function abrirModalEditar(id) {
     const proposta = propostas.find((p) => p.id === id);
     if (!proposta) return;
@@ -1016,13 +1162,11 @@
 
     document.getElementById("novo-cliente").value = proposta.cliente || "";
     document.getElementById("novo-parceiro").value = proposta.parceiro || "";
-    document.getElementById("novo-servico").value = proposta.servico || "";
-    document.getElementById("novo-valor").value =
-      proposta.valor != null ? proposta.valor.toString().replace(".", ",") : "";
     document.getElementById("novo-status").value = proposta.status || "Aberta";
-    document.getElementById("novo-data-entrada").value =
-      proposta.dataEntrada || "";
+    document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
     document.getElementById("novo-prazo").value = proposta.prazo || "";
+
+    preencherServicosNoModal(proposta);
 
     modalBackdrop.style.display = "flex";
   }
@@ -1043,8 +1187,6 @@
   btnSalvarModal.addEventListener("click", () => {
     const cliente = document.getElementById("novo-cliente").value.trim();
     const parceiro = document.getElementById("novo-parceiro").value.trim();
-    const servico = document.getElementById("novo-servico").value.trim();
-    const valorStr = document.getElementById("novo-valor").value.trim();
     const status = document.getElementById("novo-status").value;
     const dataEntrada =
       document.getElementById("novo-data-entrada").value || hojeISO();
@@ -1055,7 +1197,10 @@
       return;
     }
 
-    const valor = parseValor(valorStr);
+    const { baixa, media, cftv, cabeamento, total } = obterServicosDaUI();
+
+    const servicosObj = { baixa, media, cftv, cabeamento };
+    const valor = total;
 
     if (editingId === null) {
       // nova proposta
@@ -1063,7 +1208,7 @@
         id: Date.now(),
         cliente,
         parceiro,
-        servico,
+        servicos: servicosObj,
         valor,
         status,
         dataEntrada,
@@ -1078,7 +1223,7 @@
           ...propostas[idx],
           cliente,
           parceiro,
-          servico,
+          servicos: servicosObj,
           valor,
           status,
           dataEntrada,
@@ -1090,6 +1235,14 @@
     salvarPropostas();
     fecharModal();
     aplicarFiltros();
+  });
+
+  // listeners para atualizar total quando mexer nos serviços
+  ["chk-servico-bt", "chk-servico-mt", "chk-servico-cftv", "chk-servico-cab"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", atualizarValorTotalUI);
+  });
+  ["val-servico-bt", "val-servico-mt", "val-servico-cftv", "val-servico-cab"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", atualizarValorTotalUI);
   });
 
   // ---------- EXPORTAR / IMPORTAR ----------
