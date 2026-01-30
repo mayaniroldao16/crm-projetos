@@ -11,12 +11,11 @@
 
   <style>
     :root {
-      /* cores principais inspiradas na logo */
       --bg-main: #050816;
       --bg-card: #090e1e;
       --border-soft: 1px solid rgba(255, 255, 255, 0.04);
 
-      --accent: #e3b12b;         /* dourado */
+      --accent: #e3b12b;
       --accent-strong: #e3b12b;
       --accent-soft: rgba(227, 177, 43, 0.12);
 
@@ -32,36 +31,23 @@
       --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.75);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: radial-gradient(circle at top left, #111827, #020617 55%, #000000 100%);
       color: var(--text);
       min-height: 100vh;
     }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font-family: inherit;
-    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
 
     .app {
-      max-width: 1200px;
+      max-width: 1220px;
       margin: 0 auto;
       padding: 1.5rem 1.5rem 3rem;
     }
 
     /* HEADER */
-
     .header {
       display: flex;
       align-items: center;
@@ -69,19 +55,8 @@
       margin-bottom: 1.5rem;
       gap: 1rem;
     }
-
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
+    .header-left { display: flex; flex-direction: column; gap: 0.5rem; }
+    .brand { display: flex; align-items: center; gap: 0.8rem; }
     .brand-logo {
       width: 68px;
       height: auto;
@@ -90,13 +65,7 @@
       padding: 0.2rem 0.3rem;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
-
-    .brand-titles {
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
-    }
-
+    .brand-titles { display: flex; flex-direction: column; gap: 0.1rem; }
     .brand-title {
       font-size: 1rem;
       font-weight: 600;
@@ -104,11 +73,7 @@
       text-transform: uppercase;
       color: #f3f4ff;
     }
-
-    .brand-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-soft);
-    }
+    .brand-subtitle { font-size: 0.8rem; color: var(--text-soft); }
 
     .badge {
       display: inline-flex;
@@ -122,18 +87,9 @@
       background: rgba(9, 10, 24, 0.85);
       width: fit-content;
     }
+    .badge-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
 
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
     .btn {
       border-radius: var(--radius-full);
@@ -149,25 +105,19 @@
       gap: 0.4rem;
       transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
     }
-
     .btn:hover {
       background: rgba(15, 23, 42, 1);
       transform: translateY(-1px);
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.7);
     }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--accent-strong), #facc6b);
       border-color: transparent;
       color: #1f2933;
     }
-
-    .btn-primary:hover {
-      box-shadow: 0 14px 38px rgba(227, 177, 43, 0.55);
-    }
+    .btn-primary:hover { box-shadow: 0 14px 38px rgba(227, 177, 43, 0.55); }
 
     /* GRID PRINCIPAL */
-
     .grid-top {
       display: grid;
       grid-template-columns: 2fr 2fr;
@@ -182,22 +132,15 @@
       box-shadow: var(--shadow-soft);
       padding: 1rem 1rem 1.1rem;
     }
+    .card-title { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 0.75rem; }
 
-    .card-title {
-      font-size: 0.85rem;
-      color: var(--text-soft);
-      margin-bottom: 0.75rem;
-    }
-
-    /* VISÃO GERAL */
-
+    /* VISÃO GERAL (KPIs extras) */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 0.6rem;
       margin-bottom: 0.8rem;
     }
-
     .kpi-card {
       border-radius: var(--radius-md);
       background: #050816;
@@ -205,16 +148,8 @@
       padding: 0.6rem 0.7rem;
       font-size: 0.8rem;
     }
-
-    .kpi-label {
-      color: var(--text-soft);
-      margin-bottom: 0.3rem;
-    }
-
-    .kpi-value {
-      font-size: 1rem;
-      font-weight: 600;
-    }
+    .kpi-label { color: var(--text-soft); margin-bottom: 0.3rem; }
+    .kpi-value { font-size: 1rem; font-weight: 600; }
 
     .kpi-pill {
       display: inline-flex;
@@ -227,16 +162,8 @@
       background: var(--accent-soft);
       color: var(--accent-strong);
     }
-
-    .kpi-pill.ok {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-    }
-
-    .kpi-pill.bad {
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
+    .kpi-pill.ok { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+    .kpi-pill.bad { background: var(--danger-soft); color: var(--danger); }
 
     .kpi-total-open {
       margin-top: 0.4rem;
@@ -249,40 +176,30 @@
       justify-content: space-between;
       font-size: 0.8rem;
     }
+    .kpi-total-open span:first-child { color: var(--text-soft); }
+    .kpi-total-open strong { font-size: 1rem; color: var(--accent-strong); }
 
-    .kpi-total-open span:first-child {
-      color: var(--text-soft);
+    .kpi-subrow {
+      margin-top: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
     }
-
-    .kpi-total-open strong {
-      font-size: 1rem;
-      color: var(--accent-strong);
+    .kpi-mini {
+      border-radius: var(--radius-md);
+      background: rgba(9, 11, 26, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 0.55rem 0.65rem;
+      font-size: 0.8rem;
     }
+    .kpi-mini .kpi-value { font-size: 0.95rem; }
 
     /* FILTROS */
+    .filters-row { display: flex; flex-direction: column; gap: 0.75rem; }
+    .filters-top { display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; }
+    .filters-group { display: flex; flex-wrap: wrap; gap: 0.5rem; flex: 1; }
 
-    .filters-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .filters-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .filters-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      flex: 1;
-    }
-
-    .input,
-    .select {
+    .input, .select {
       background: #050816;
       border-radius: var(--radius-full);
       border: 1px solid rgba(148, 163, 184, 0.5);
@@ -292,14 +209,8 @@
       outline: none;
       min-width: 0;
     }
-
-    .input {
-      flex: 1;
-    }
-
-    .select {
-      cursor: pointer;
-    }
+    .input { flex: 1; }
+    .select { cursor: pointer; }
 
     .filters-badges {
       display: flex;
@@ -308,7 +219,6 @@
       font-size: 0.7rem;
       color: var(--text-soft);
     }
-
     .filters-badges span {
       background: rgba(9, 11, 26, 0.9);
       border-radius: var(--radius-full);
@@ -317,40 +227,19 @@
     }
 
     /* ÁREA DO GRÁFICO */
-
-    .card-chart-body {
-      height: 260px;
-      position: relative;
-    }
+    .card-chart-body { height: 260px; position: relative; }
 
     /* LISTA / TABELA */
-
-    .card-list {
-      margin-top: 1rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
-      margin-top: 0.6rem;
-    }
-
+    .card-list { margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.6rem; }
     th, td {
       padding: 0.4rem 0.5rem;
       text-align: left;
       border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      vertical-align: top;
     }
-
-    th {
-      color: var(--text-soft);
-      font-weight: 500;
-      font-size: 0.75rem;
-    }
-
-    tr:hover td {
-      background: rgba(15, 23, 42, 0.7);
-    }
+    th { color: var(--text-soft); font-weight: 500; font-size: 0.75rem; }
+    tr:hover td { background: rgba(15, 23, 42, 0.7); }
 
     .tag-status {
       padding: 0.12rem 0.5rem;
@@ -359,27 +248,12 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      white-space: nowrap;
     }
-
-    .tag-aberta {
-      background: rgba(227, 177, 43, 0.18);
-      color: #facc6b;
-    }
-
-    .tag-ganha {
-      background: rgba(71, 85, 105, 0.25);
-      color: #e5e7eb;
-    }
-
-    .tag-perdida {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fca5a5;
-    }
-
-    .tag-atrasada {
-      background: rgba(234, 179, 8, 0.18);
-      color: #facc15;
-    }
+    .tag-aberta { background: rgba(227, 177, 43, 0.18); color: #facc6b; }
+    .tag-ganha { background: rgba(71, 85, 105, 0.25); color: #e5e7eb; }
+    .tag-perdida { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    .tag-atrasada { background: rgba(234, 179, 8, 0.18); color: #facc15; }
 
     .btn-table {
       border-radius: var(--radius-full);
@@ -389,14 +263,15 @@
       font-size: 0.7rem;
       padding: 0.18rem 0.55rem;
       cursor: pointer;
+      margin-right: 0.25rem;
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
     }
+    .btn-table:hover { background: rgba(15, 23, 42, 0.8); }
+    .btn-table.success { border-color: rgba(34, 197, 94, 0.55); }
+    .btn-table.danger { border-color: rgba(239, 68, 68, 0.55); }
 
-    .btn-table:hover {
-      background: rgba(15, 23, 42, 0.8);
-    }
-
-    /* MODAL NOVA/EDITAR PROPOSTA */
-
+    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -405,49 +280,28 @@
       align-items: center;
       justify-content: center;
       z-index: 40;
+      padding: 1rem;
     }
-
     .modal {
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       background: #050816;
       border-radius: var(--radius-lg);
       border: var(--border-soft);
       box-shadow: var(--shadow-soft);
       padding: 1.2rem 1.3rem 1.3rem;
     }
-
     .modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 0.6rem;
     }
-
-    .modal-header h2 {
-      font-size: 1rem;
-    }
-
-    .modal-body {
-      display: grid;
-      gap: 0.6rem;
-      font-size: 0.78rem;
-    }
-
-    .modal-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-    }
-
-    .modal label {
-      display: block;
-      margin-bottom: 0.15rem;
-      color: var(--text-soft);
-    }
-
-    .modal input,
-    .modal select {
+    .modal-header h2 { font-size: 1rem; }
+    .modal-body { display: grid; gap: 0.6rem; font-size: 0.78rem; }
+    .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .modal label { display: block; margin-bottom: 0.15rem; color: var(--text-soft); }
+    .modal input, .modal select {
       width: 100%;
       font-size: 0.8rem;
       padding: 0.38rem 0.6rem;
@@ -457,44 +311,14 @@
       color: var(--text);
       outline: none;
     }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.4rem;
-      margin-top: 0.8rem;
-    }
-
-    .btn-sm {
-      padding: 0.35rem 0.75rem;
-      font-size: 0.78rem;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      border-color: transparent;
-      color: var(--text-soft);
-    }
-
-    .btn-ghost:hover {
-      background: rgba(15, 23, 42, 0.8);
-    }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.8rem; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--text-soft); }
+    .btn-ghost:hover { background: rgba(15, 23, 42, 0.8); }
 
     /* SERVIÇOS NO MODAL */
-    .servicos-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      margin-top: 0.1rem;
-    }
-
-    .servico-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-
+    .servicos-grid { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.1rem; }
+    .servico-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
     .servico-row label {
       display: flex;
       align-items: center;
@@ -502,52 +326,33 @@
       color: var(--text-soft);
       font-size: 0.78rem;
     }
+    .servico-row input[type="checkbox"] { width: 14px; height: 14px; }
+    .servico-row input[type="text"] { max-width: 150px; text-align: right; }
 
-    .servico-row input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
-    }
-
-    .servico-row input[type="text"] {
-      max-width: 120px;
-      text-align: right;
+    .help-hint {
+      font-size: 0.72rem;
+      color: rgba(161, 165, 181, 0.9);
+      margin-top: 0.25rem;
+      line-height: 1.25;
     }
 
     /* RESPONSIVO */
-
-    @media (max-width: 900px) {
-      .grid-top {
-        grid-template-columns: minmax(0, 1fr);
-      }
+    @media (max-width: 980px) {
+      .grid-top { grid-template-columns: minmax(0, 1fr); }
+      .kpi-subrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-
     @media (max-width: 720px) {
-      .app {
-        padding: 1rem 1rem 2.5rem;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .header-actions {
-        align-self: stretch;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-      }
-
-      .kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .filters-top {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      .app { padding: 1rem 1rem 2.5rem; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .header-actions { align-self: stretch; justify-content: flex-start; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-subrow { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      .filters-top { flex-direction: column; align-items: stretch; }
+      .modal-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
 <div class="app">
   <!-- HEADER -->
@@ -595,15 +400,41 @@
         <div class="kpi-card">
           <div class="kpi-label">Atrasadas</div>
           <div class="kpi-value" id="kpi-atrasadas">0</div>
-          <div class="kpi-pill ok" id="pill-atrasadas">
-            <span>ok</span>
-          </div>
+          <div class="kpi-pill ok" id="pill-atrasadas"><span>ok</span></div>
         </div>
       </div>
 
       <div class="kpi-total-open">
         <span>Valor em aberto</span>
         <strong id="kpi-valor-aberto">R$ 0,00</strong>
+      </div>
+
+      <!-- KPIs extras (item 6) -->
+      <div class="kpi-subrow">
+        <div class="kpi-mini">
+          <div class="kpi-label">Conversão</div>
+          <div class="kpi-value" id="kpi-conversao">0%</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Ticket médio (ganhas)</div>
+          <div class="kpi-value" id="kpi-ticket">R$ 0,00</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Valor ganho</div>
+          <div class="kpi-value" id="kpi-valor-ganho">R$ 0,00</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Valor perdido</div>
+          <div class="kpi-value" id="kpi-valor-perdido">R$ 0,00</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Perdidas / Canceladas</div>
+          <div class="kpi-value" id="kpi-perdidas">0</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Última atualização</div>
+          <div class="kpi-value" id="kpi-updated">—</div>
+        </div>
       </div>
     </section>
 
@@ -618,7 +449,7 @@
               type="text"
               class="input"
               id="filtro-busca"
-              placeholder="Buscar por cliente, parceiro, serviço, cidade..."
+              placeholder="Buscar por nº, cliente, parceiro, responsável, cidade/UF, serviço..."
             />
 
             <select class="select" id="filtro-etapa">
@@ -637,9 +468,7 @@
           </div>
         </div>
 
-        <div class="filters-badges" id="info-filtros">
-          <!-- preenchido via JS -->
-        </div>
+        <div class="filters-badges" id="info-filtros"></div>
       </div>
     </section>
   </div>
@@ -659,19 +488,20 @@
     <table>
       <thead>
         <tr>
+          <th>Nº</th>
           <th>Cliente</th>
           <th>Parceiro</th>
+          <th>Responsável</th>
+          <th>Cidade/UF</th>
           <th>Serviços</th>
-          <th>Valor (R$)</th>
+          <th>Valor</th>
           <th>Status</th>
           <th>Entrada</th>
           <th>Prazo</th>
           <th>Ações</th>
         </tr>
       </thead>
-      <tbody id="tabela-propostas">
-        <!-- preenchido via JS -->
-      </tbody>
+      <tbody id="tabela-propostas"></tbody>
     </table>
   </section>
 </div>
@@ -683,15 +513,40 @@
       <h2 id="modal-titulo">Nova proposta</h2>
       <button class="btn-ghost btn-sm" id="btn-fechar-modal">✕</button>
     </div>
+
     <div class="modal-body">
-      <div>
-        <label for="novo-cliente">Cliente</label>
-        <input id="novo-cliente" type="text" required />
+      <!-- (item 5) campos extras -->
+      <div class="modal-row">
+        <div>
+          <label for="novo-numero">Número da proposta</label>
+          <input id="novo-numero" type="text" placeholder="Ex: 2026-001" />
+        </div>
+        <div>
+          <label for="novo-responsavel">Responsável interno</label>
+          <input id="novo-responsavel" type="text" placeholder="Ex: Mayani" />
+        </div>
       </div>
 
-      <div>
-        <label for="novo-parceiro">Parceiro</label>
-        <input id="novo-parceiro" type="text" />
+      <div class="modal-row">
+        <div>
+          <label for="novo-cliente">Cliente</label>
+          <input id="novo-cliente" type="text" required />
+        </div>
+        <div>
+          <label for="novo-parceiro">Parceiro</label>
+          <input id="novo-parceiro" type="text" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div>
+          <label for="novo-cidade">Cidade</label>
+          <input id="novo-cidade" type="text" placeholder="Ex: Cuiabá" />
+        </div>
+        <div>
+          <label for="novo-uf">UF</label>
+          <input id="novo-uf" type="text" maxlength="2" placeholder="MT" />
+        </div>
       </div>
 
       <div>
@@ -702,35 +557,38 @@
               <input type="checkbox" id="chk-servico-bt">
               Elétrico Baixa Tensão
             </label>
-            <input type="text" id="val-servico-bt" placeholder="0,00" />
+            <input type="text" id="val-servico-bt" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
             <label>
               <input type="checkbox" id="chk-servico-mt">
               Elétrico Média Tensão
             </label>
-            <input type="text" id="val-servico-mt" placeholder="0,00" />
+            <input type="text" id="val-servico-mt" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
             <label>
               <input type="checkbox" id="chk-servico-cftv">
               CFTV
             </label>
-            <input type="text" id="val-servico-cftv" placeholder="0,00" />
+            <input type="text" id="val-servico-cftv" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
             <label>
               <input type="checkbox" id="chk-servico-cab">
               Cabeamento Estruturado
             </label>
-            <input type="text" id="val-servico-cab" placeholder="0,00" />
+            <input type="text" id="val-servico-cab" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
+        </div>
+        <div class="help-hint">
+          Dica: digite normalmente (ex: 1500) que o campo vira <b>R$ 1.500,00</b>.
         </div>
       </div>
 
       <div class="modal-row">
         <div>
-          <label for="novo-valor-total">Valor total (R$)</label>
+          <label for="novo-valor-total">Valor total</label>
           <input id="novo-valor-total" type="text" readonly />
         </div>
         <div>
@@ -754,6 +612,7 @@
         </div>
       </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn btn-ghost btn-sm" id="btn-cancelar-modal">Cancelar</button>
       <button class="btn btn-primary btn-sm" id="btn-salvar-modal">Salvar</button>
@@ -762,6 +621,14 @@
 </div>
 
 <script>
+  // =========================================================
+  //  (ITENS APLICADOS)
+  //  1) MOEDA AUTOMÁTICA (R$) NOS CAMPOS DE VALOR
+  //  3) CONTROLE DE STATUS (BOTÕES RÁPIDOS + CONFIRMAÇÃO)
+  //  5) CAMPOS EXTRAS (Nº, CIDADE/UF, RESPONSÁVEL)
+  //  6) DASHBOARD (CONVERSÃO, TICKET MÉDIO, VALOR GANHO/PERDIDO)
+  // =========================================================
+
   // ---------- UTILIDADES ----------
   function parseValor(valorStr) {
     if (typeof valorStr === "number") return valorStr;
@@ -775,7 +642,7 @@
   }
 
   function formatarMoeda(valor) {
-    return valor.toLocaleString("pt-BR", {
+    return (Number(valor) || 0).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
       minimumFractionDigits: 2,
@@ -786,8 +653,35 @@
     return new Date().toISOString().slice(0, 10);
   }
 
+  function agoraHHMM() {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+
+  // ---------- MOEDA AUTOMÁTICA (item 1) ----------
+  // Converte "1500" em "R$ 15,00"? Não: aqui a regra é "centavos" padrão:
+  // digitou 1500 -> R$ 15,00. Para comportamento "1500 -> 1.500,00", use modo inteiro.
+  // Como você usa propostas, é melhor "1500 -> 1.500,00". Então: MODO INTEIRO.
+  function apenasDigitos(s) { return (s || "").toString().replace(/\D/g, ""); }
+
+  // MODO INTEIRO: "1500" -> 1500.00
+  function maskMoedaInteiro(el) {
+    const raw = apenasDigitos(el.value);
+    const numero = raw ? Number(raw) : 0;
+    el.dataset.number = String(numero);
+    el.value = raw ? formatarMoeda(numero) : "";
+  }
+
+  function setMoeda(el, numero) {
+    const n = Number(numero) || 0;
+    el.dataset.number = String(n);
+    el.value = n ? formatarMoeda(n) : "";
+  }
+
   // ---------- DADOS / LOCALSTORAGE ----------
-  const STORAGE_KEY = "crm_propostas_roldao";
+  const STORAGE_KEY = "crm_propostas_roldao_v2";
 
   function carregarPropostas() {
     try {
@@ -806,25 +700,63 @@
 
   let propostas = carregarPropostas();
 
+  // Migração simples se vier de versões antigas:
+  function normalizarProposta(p) {
+    const serv = p.servicos || {
+      baixa: parseValor(p.baixa),
+      media: parseValor(p.media),
+      cftv: parseValor(p.cftv),
+      cabeamento: parseValor(p.cabeamento),
+    };
+
+    const valor = p.valor != null ? parseValor(p.valor) : (
+      parseValor(serv.baixa) + parseValor(serv.media) + parseValor(serv.cftv) + parseValor(serv.cabeamento)
+    );
+
+    return {
+      id: p.id ?? Date.now(),
+      numero: p.numero || p.num || "",
+      cliente: p.cliente || "",
+      parceiro: p.parceiro || "",
+      responsavel: p.responsavel || p.responsável || "",
+      cidade: p.cidade || "",
+      uf: (p.uf || "").toString().toUpperCase().slice(0, 2),
+      servicos: {
+        baixa: parseValor(serv.baixa),
+        media: parseValor(serv.media),
+        cftv: parseValor(serv.cftv),
+        cabeamento: parseValor(serv.cabeamento),
+      },
+      valor,
+      status: p.status || "Aberta",
+      dataEntrada: p.dataEntrada || p.data || hojeISO(),
+      prazo: p.prazo || "",
+      updatedAt: p.updatedAt || "",
+    };
+  }
+
+  propostas = propostas.map(normalizarProposta);
+
   // se estiver vazio, cria um exemplo
   if (propostas.length === 0) {
     propostas = [
-      {
+      normalizarProposta({
         id: 1,
+        numero: "2026-001",
         cliente: "Academia Corpo Ativo",
         parceiro: "Eng. Diogo",
-        servicos: {
-          baixa: 3000,
-          media: 0,
-          cftv: 2500,
-          cabeamento: 0,
-        },
-        valor: 5500,
+        responsavel: "Mayani",
+        cidade: "Cuiabá",
+        uf: "MT",
+        servicos: { baixa: 3000, media: 0, cftv: 2500, cabeamento: 0 },
         status: "Aberta",
         dataEntrada: hojeISO(),
         prazo: hojeISO(),
-      },
+      }),
     ];
+    salvarPropostas();
+  } else {
+    // garante que todas estão normalizadas no storage
     salvarPropostas();
   }
 
@@ -833,10 +765,10 @@
     if (p.servicos) {
       const s = p.servicos;
       const nomes = [];
-      if (s.baixa) nomes.push("Elétrico Baixa Tensão");
-      if (s.media) nomes.push("Elétrico Média Tensão");
-      if (s.cftv) nomes.push("CFTV");
-      if (s.cabeamento) nomes.push("Cabeamento Estruturado");
+      if (parseValor(s.baixa) > 0) nomes.push("Elétrico Baixa Tensão");
+      if (parseValor(s.media) > 0) nomes.push("Elétrico Média Tensão");
+      if (parseValor(s.cftv) > 0) nomes.push("CFTV");
+      if (parseValor(s.cabeamento) > 0) nomes.push("Cabeamento Estruturado");
       return nomes.join(", ") || "-";
     }
     return p.servico || "-";
@@ -848,55 +780,64 @@
     const chkCftv = document.getElementById("chk-servico-cftv").checked;
     const chkCab  = document.getElementById("chk-servico-cab").checked;
 
-    const valBt   = chkBt   ? parseValor(document.getElementById("val-servico-bt").value)   : 0;
-    const valMt   = chkMt   ? parseValor(document.getElementById("val-servico-mt").value)   : 0;
-    const valCftv = chkCftv ? parseValor(document.getElementById("val-servico-cftv").value) : 0;
-    const valCab  = chkCab  ? parseValor(document.getElementById("val-servico-cab").value)  : 0;
+    const elBt   = document.getElementById("val-servico-bt");
+    const elMt   = document.getElementById("val-servico-mt");
+    const elCftv = document.getElementById("val-servico-cftv");
+    const elCab  = document.getElementById("val-servico-cab");
+
+    const valBt   = chkBt   ? parseValor(elBt.value)   : 0;
+    const valMt   = chkMt   ? parseValor(elMt.value)   : 0;
+    const valCftv = chkCftv ? parseValor(elCftv.value) : 0;
+    const valCab  = chkCab  ? parseValor(elCab.value)  : 0;
 
     const total = valBt + valMt + valCftv + valCab;
 
-    return {
-      baixa: valBt,
-      media: valMt,
-      cftv: valCftv,
-      cabeamento: valCab,
-      total,
-    };
+    return { baixa: valBt, media: valMt, cftv: valCftv, cabeamento: valCab, total };
   }
 
   function atualizarValorTotalUI() {
     const { total } = obterServicosDaUI();
     const inputTotal = document.getElementById("novo-valor-total");
-    inputTotal.value = total ? total.toString().replace(".", ",") : "";
+    inputTotal.value = total ? formatarMoeda(total) : "";
   }
 
-  // ---------- KPIs ----------
+  // ---------- KPIs (item 6) ----------
   function atualizarKpis(lista) {
     const total = lista.length;
     const abertas = lista.filter((p) => p.status === "Aberta").length;
     const ganhas = lista.filter((p) => p.status === "Ganha").length;
-    const perdidas = lista.filter((p) =>
-      p.status.startsWith("Perdida")
-    ).length;
+    const perdidas = lista.filter((p) => p.status && p.status.startsWith("Perdida")).length;
 
-    const hoje = new Date().toISOString().slice(0, 10);
-    const atrasadas = lista.filter(
-      (p) =>
-        p.status === "Aberta" &&
-        p.prazo &&
-        p.prazo < hoje
-    ).length;
+    const hoje = hojeISO();
+    const atrasadas = lista.filter((p) => p.status === "Aberta" && p.prazo && p.prazo < hoje).length;
 
     const valorAberto = lista
       .filter((p) => p.status === "Aberta")
-      .reduce((acc, p) => acc + (p.valor || 0), 0);
+      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
+
+    const valorGanho = lista
+      .filter((p) => p.status === "Ganha")
+      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
+
+    const valorPerdido = lista
+      .filter((p) => p.status && p.status.startsWith("Perdida"))
+      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
+
+    const denom = (ganhas + perdidas);
+    const conversao = denom > 0 ? (ganhas / denom) * 100 : 0;
+    const ticket = ganhas > 0 ? (valorGanho / ganhas) : 0;
 
     document.getElementById("kpi-total").textContent = total;
     document.getElementById("kpi-abertas").textContent = abertas;
     document.getElementById("kpi-ganhas").textContent = ganhas;
+    document.getElementById("kpi-perdidas").textContent = perdidas;
     document.getElementById("kpi-atrasadas").textContent = atrasadas;
-    document.getElementById("kpi-valor-aberto").textContent =
-      formatarMoeda(valorAberto);
+    document.getElementById("kpi-valor-aberto").textContent = formatarMoeda(valorAberto);
+
+    document.getElementById("kpi-conversao").textContent = `${conversao.toFixed(0)}%`;
+    document.getElementById("kpi-ticket").textContent = formatarMoeda(ticket);
+    document.getElementById("kpi-valor-ganho").textContent = formatarMoeda(valorGanho);
+    document.getElementById("kpi-valor-perdido").textContent = formatarMoeda(valorPerdido);
 
     const pill = document.getElementById("pill-atrasadas");
     pill.classList.remove("ok", "bad");
@@ -907,35 +848,67 @@
       pill.textContent = `${atrasadas} atrasada(s)`;
       pill.classList.add("bad");
     }
+
+    // última atualização (maior updatedAt)
+    const updated = lista
+      .map(p => p.updatedAt || "")
+      .filter(Boolean)
+      .sort()
+      .pop();
+    document.getElementById("kpi-updated").textContent = updated ? updated : "—";
   }
 
   // ---------- TABELA ----------
   function linhaStatusTag(status, prazo) {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeISO();
     const atrasada = status === "Aberta" && prazo && prazo < hoje;
 
     let classe = "tag-aberta";
     if (status === "Ganha") classe = "tag-ganha";
-    if (status.startsWith("Perdida")) classe = "tag-perdida";
+    if (status && status.startsWith("Perdida")) classe = "tag-perdida";
     if (atrasada) classe = "tag-atrasada";
 
     return `<span class="tag-status ${classe}">${status}</span>`;
   }
 
+  function cidadeUf(p) {
+    const c = (p.cidade || "").trim();
+    const uf = (p.uf || "").trim().toUpperCase();
+    if (!c && !uf) return "";
+    if (c && uf) return `${c}/${uf}`;
+    return c || uf;
+  }
+
+  // (item 3) ações rápidas de status
   function atualizarTabela(lista) {
     const tbody = document.getElementById("tabela-propostas");
     if (lista.length === 0) {
       tbody.innerHTML =
-        '<tr><td colspan="8" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
+        '<tr><td colspan="11" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
       return;
     }
 
     tbody.innerHTML = lista
       .map((p) => {
+        const num = (p.numero || "").trim();
+        const resp = (p.responsavel || "").trim();
+        const cuf = cidadeUf(p);
+
+        const btnGanha = p.status === "Ganha"
+          ? ""
+          : `<button class="btn-table success btn-marcar" data-id="${p.id}" data-status="Ganha">Marcar ganha</button>`;
+
+        const btnPerdida = (p.status && p.status.startsWith("Perdida"))
+          ? ""
+          : `<button class="btn-table danger btn-marcar" data-id="${p.id}" data-status="Perdida">Marcar perdida</button>`;
+
         return `
           <tr>
+            <td>${num}</td>
             <td>${p.cliente || ""}</td>
             <td>${p.parceiro || ""}</td>
+            <td>${resp}</td>
+            <td>${cuf}</td>
             <td>${descricaoServicos(p)}</td>
             <td>${formatarMoeda(p.valor || 0)}</td>
             <td>${linhaStatusTag(p.status, p.prazo)}</td>
@@ -943,6 +916,8 @@
             <td>${p.prazo || ""}</td>
             <td>
               <button class="btn-table btn-editar" data-id="${p.id}">Editar</button>
+              ${btnGanha}
+              ${btnPerdida}
             </td>
           </tr>
         `;
@@ -955,23 +930,44 @@
         abrirModalEditar(id);
       });
     });
+
+    document.querySelectorAll(".btn-marcar").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+        const status = btn.dataset.status;
+        marcarStatusRapido(id, status);
+      });
+    });
+  }
+
+  function marcarStatusRapido(id, novoStatus) {
+    const idx = propostas.findIndex((p) => p.id === id);
+    if (idx === -1) return;
+
+    if (novoStatus === "Perdida") {
+      const ok = confirm("Confirmar: marcar esta proposta como Perdida / Cancelada?");
+      if (!ok) return;
+      propostas[idx].status = "Perdida / Cancelada";
+    } else {
+      propostas[idx].status = "Ganha";
+    }
+
+    propostas[idx].updatedAt = `${hojeISO()} ${agoraHHMM()}`;
+    salvarPropostas();
+    aplicarFiltros();
   }
 
   // ---------- GRÁFICO EM PIZZA ----------
   let chartValores = null;
 
   function somarValoresPorStatus(lista) {
-    const soma = {
-      abertas: 0,
-      ganhas: 0,
-      perdidas: 0,
-    };
+    const soma = { abertas: 0, ganhas: 0, perdidas: 0 };
 
     lista.forEach((p) => {
       const valor = parseValor(p.valor);
       if (p.status === "Aberta") soma.abertas += valor;
       else if (p.status === "Ganha") soma.ganhas += valor;
-      else if (p.status.startsWith("Perdida")) soma.perdidas += valor;
+      else if (p.status && p.status.startsWith("Perdida")) soma.perdidas += valor;
     });
 
     return soma;
@@ -989,27 +985,19 @@
     const cores = todosZero
       ? ["rgba(148, 163, 184, 0.7)"]
       : [
-          "rgba(227, 177, 43, 0.9)",   // abertas - dourado
-          "rgba(75, 85, 99, 0.9)",     // ganhas - cinza/azul
-          "rgba(239, 68, 68, 0.9)",    // perdidas - vermelho
+          "rgba(227, 177, 43, 0.9)",
+          "rgba(75, 85, 99, 0.9)",
+          "rgba(239, 68, 68, 0.9)",
         ];
 
     if (!chartValores) {
-      const ctx = document
-        .getElementById("chart-valores")
-        .getContext("2d");
+      const ctx = document.getElementById("chart-valores").getContext("2d");
 
       chartValores = new Chart(ctx, {
         type: "pie",
         data: {
           labels: dataLabels,
-          datasets: [
-            {
-              data: dataValues,
-              backgroundColor: cores,
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{ data: dataValues, backgroundColor: cores, borderWidth: 1 }],
         },
         options: {
           responsive: true,
@@ -1017,10 +1005,7 @@
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                color: "#e5e7eb",
-                font: { size: 11 },
-              },
+              labels: { color: "#e5e7eb", font: { size: 11 } },
             },
             tooltip: {
               callbacks: {
@@ -1059,9 +1044,12 @@
     if (busca) {
       lista = lista.filter((p) => {
         const texto = `
+          ${p.numero || ""} 
           ${p.cliente || ""} 
           ${p.parceiro || ""} 
-          ${descricaoServicos(p)} 
+          ${p.responsavel || ""} 
+          ${p.cidade || ""} ${p.uf || ""} 
+          ${descricaoServicos(p)}
         `.toLowerCase();
         return texto.includes(busca);
       });
@@ -1071,35 +1059,23 @@
       lista = lista.filter((p) => {
         if (etapa === "aberta") return p.status === "Aberta";
         if (etapa === "ganha") return p.status === "Ganha";
-        if (etapa === "perdida") return p.status.startsWith("Perdida");
+        if (etapa === "perdida") return p.status && p.status.startsWith("Perdida");
         return true;
       });
     }
 
     lista.sort((a, b) => {
-      if (ordenar === "recentes") {
-        return (b.dataEntrada || "").localeCompare(a.dataEntrada || "");
-      }
-      if (ordenar === "antigas") {
-        return (a.dataEntrada || "").localeCompare(b.dataEntrada || "");
-      }
-      if (ordenar === "maior-valor") {
-        return parseValor(b.valor) - parseValor(a.valor);
-      }
-      if (ordenar === "menor-valor") {
-        return parseValor(a.valor) - parseValor(b.valor);
-      }
+      if (ordenar === "recentes") return (b.dataEntrada || "").localeCompare(a.dataEntrada || "");
+      if (ordenar === "antigas") return (a.dataEntrada || "").localeCompare(b.dataEntrada || "");
+      if (ordenar === "maior-valor") return parseValor(b.valor) - parseValor(a.valor);
+      if (ordenar === "menor-valor") return parseValor(a.valor) - parseValor(b.valor);
       return 0;
     });
 
     const partes = [];
     if (busca) partes.push(`Buscando por: "${busca}"`);
     if (etapa !== "todas") {
-      const mapa = {
-        aberta: "Abertas",
-        ganha: "Ganhas",
-        perdida: "Perdidas/Canceladas",
-      };
+      const mapa = { aberta: "Abertas", ganha: "Ganhas", perdida: "Perdidas/Canceladas" };
       partes.push(`Etapa: ${mapa[etapa] || ""}`);
     }
     if (ordenar === "recentes") partes.push("Ordenado: mais recentes");
@@ -1132,8 +1108,12 @@
   let editingId = null;
 
   function limparCamposModal() {
+    document.getElementById("novo-numero").value = "";
+    document.getElementById("novo-responsavel").value = "";
     document.getElementById("novo-cliente").value = "";
     document.getElementById("novo-parceiro").value = "";
+    document.getElementById("novo-cidade").value = "";
+    document.getElementById("novo-uf").value = "";
 
     document.getElementById("chk-servico-bt").checked = false;
     document.getElementById("chk-servico-mt").checked = false;
@@ -1161,28 +1141,20 @@
   }
 
   function preencherServicosNoModal(proposta) {
-    if (proposta.servicos) {
-      const s = proposta.servicos;
-      const setRow = (chkId, valId, valor) => {
-        const checked = !!valor;
-        document.getElementById(chkId).checked = checked;
-        document.getElementById(valId).value = checked ? valor.toString().replace(".", ",") : "";
-      };
-      setRow("chk-servico-bt", "val-servico-bt", s.baixa || 0);
-      setRow("chk-servico-mt", "val-servico-mt", s.media || 0);
-      setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
-      setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
-    } else {
-      document.getElementById("chk-servico-bt").checked = true;
-      document.getElementById("val-servico-bt").value =
-        proposta.valor != null ? proposta.valor.toString().replace(".", ",") : "";
-      document.getElementById("chk-servico-mt").checked = false;
-      document.getElementById("val-servico-mt").value = "";
-      document.getElementById("chk-servico-cftv").checked = false;
-      document.getElementById("val-servico-cftv").value = "";
-      document.getElementById("chk-servico-cab").checked = false;
-      document.getElementById("val-servico-cab").value = "";
-    }
+    const s = proposta.servicos || {};
+    const setRow = (chkId, valId, valor) => {
+      const checked = parseValor(valor) > 0;
+      document.getElementById(chkId).checked = checked;
+      const el = document.getElementById(valId);
+      if (checked) setMoeda(el, parseValor(valor));
+      else el.value = "";
+    };
+
+    setRow("chk-servico-bt", "val-servico-bt", s.baixa || 0);
+    setRow("chk-servico-mt", "val-servico-mt", s.media || 0);
+    setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
+    setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
+
     atualizarValorTotalUI();
   }
 
@@ -1194,8 +1166,13 @@
     modalTitulo.textContent = "Editar proposta";
     btnSalvarModal.textContent = "Atualizar";
 
+    document.getElementById("novo-numero").value = proposta.numero || "";
+    document.getElementById("novo-responsavel").value = proposta.responsavel || "";
     document.getElementById("novo-cliente").value = proposta.cliente || "";
     document.getElementById("novo-parceiro").value = proposta.parceiro || "";
+    document.getElementById("novo-cidade").value = proposta.cidade || "";
+    document.getElementById("novo-uf").value = (proposta.uf || "").toUpperCase();
+
     document.getElementById("novo-status").value = proposta.status || "Aberta";
     document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
     document.getElementById("novo-prazo").value = proposta.prazo || "";
@@ -1219,11 +1196,17 @@
   });
 
   btnSalvarModal.addEventListener("click", () => {
+    const numero = document.getElementById("novo-numero").value.trim();
+    const responsavel = document.getElementById("novo-responsavel").value.trim();
     const cliente = document.getElementById("novo-cliente").value.trim();
     const parceiro = document.getElementById("novo-parceiro").value.trim();
-    const status = document.getElementById("novo-status").value;
-    const dataEntrada =
-      document.getElementById("novo-data-entrada").value || hojeISO();
+    const cidade = document.getElementById("novo-cidade").value.trim();
+    const uf = document.getElementById("novo-uf").value.trim().toUpperCase().slice(0, 2);
+
+    const statusRaw = document.getElementById("novo-status").value;
+    const status = statusRaw === "Perdida" ? "Perdida / Cancelada" : statusRaw;
+
+    const dataEntrada = document.getElementById("novo-data-entrada").value || hojeISO();
     const prazo = document.getElementById("novo-prazo").value;
 
     if (!cliente) {
@@ -1235,31 +1218,55 @@
     const servicosObj = { baixa, media, cftv, cabeamento };
     const valor = total;
 
+    // (item 1) evita salvar sem valor
+    if (!valor || valor <= 0) {
+      alert("Informe ao menos um serviço com valor maior que zero.");
+      return;
+    }
+
+    // (item 3) confirmação para perdida/cancelada
+    if (status.startsWith("Perdida")) {
+      const ok = confirm("Confirmar: salvar esta proposta como Perdida / Cancelada?");
+      if (!ok) return;
+    }
+
+    const updatedAt = `${hojeISO()} ${agoraHHMM()}`;
+
     if (editingId === null) {
-      const novo = {
+      const novo = normalizarProposta({
         id: Date.now(),
+        numero,
         cliente,
         parceiro,
+        responsavel,
+        cidade,
+        uf,
         servicos: servicosObj,
         valor,
         status,
         dataEntrada,
         prazo,
-      };
+        updatedAt,
+      });
       propostas.push(novo);
     } else {
       const idx = propostas.findIndex((p) => p.id === editingId);
       if (idx !== -1) {
-        propostas[idx] = {
+        propostas[idx] = normalizarProposta({
           ...propostas[idx],
+          numero,
           cliente,
           parceiro,
+          responsavel,
+          cidade,
+          uf,
           servicos: servicosObj,
           valor,
           status,
           dataEntrada,
           prazo,
-        };
+          updatedAt,
+        });
       }
     }
 
@@ -1268,22 +1275,64 @@
     aplicarFiltros();
   });
 
-  ["chk-servico-bt", "chk-servico-mt", "chk-servico-cftv", "chk-servico-cab"].forEach((id) => {
-    document.getElementById(id).addEventListener("change", atualizarValorTotalUI);
+  // ---------- MOEDA: listeners + UX ----------
+  const servicoInputs = ["val-servico-bt", "val-servico-mt", "val-servico-cftv", "val-servico-cab"];
+  const servicoChecks = ["chk-servico-bt", "chk-servico-mt", "chk-servico-cftv", "chk-servico-cab"];
+
+  function syncDisabledByCheck() {
+    const pairs = [
+      ["chk-servico-bt", "val-servico-bt"],
+      ["chk-servico-mt", "val-servico-mt"],
+      ["chk-servico-cftv", "val-servico-cftv"],
+      ["chk-servico-cab", "val-servico-cab"],
+    ];
+    pairs.forEach(([chkId, inputId]) => {
+      const chk = document.getElementById(chkId);
+      const input = document.getElementById(inputId);
+      input.disabled = !chk.checked;
+      if (!chk.checked) input.value = "";
+    });
+    atualizarValorTotalUI();
+  }
+
+  servicoChecks.forEach((id) => {
+    document.getElementById(id).addEventListener("change", syncDisabledByCheck);
   });
-  ["val-servico-bt", "val-servico-mt", "val-servico-cftv", "val-servico-cab"].forEach((id) => {
-    document.getElementById(id).addEventListener("input", atualizarValorTotalUI);
+
+  servicoInputs.forEach((id) => {
+    const el = document.getElementById(id);
+
+    // moeda automática em modo inteiro: "1500" -> R$ 1.500,00
+    el.addEventListener("input", () => {
+      // se o usuário começar a digitar com checkbox off, liga
+      const map = {
+        "val-servico-bt": "chk-servico-bt",
+        "val-servico-mt": "chk-servico-mt",
+        "val-servico-cftv": "chk-servico-cftv",
+        "val-servico-cab": "chk-servico-cab",
+      };
+      const chkId = map[id];
+      const chk = document.getElementById(chkId);
+      if (!chk.checked && apenasDigitos(el.value).length > 0) chk.checked = true;
+
+      maskMoedaInteiro(el);
+      syncDisabledByCheck(); // atualiza total e disabled
+    });
+
+    el.addEventListener("blur", () => {
+      // mantém formatado
+      maskMoedaInteiro(el);
+      atualizarValorTotalUI();
+    });
   });
 
   // ---------- EXPORTAR / IMPORTAR ----------
   document.getElementById("btn-exportar").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(propostas, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob([JSON.stringify(propostas, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "propostas-crm.json";
+    a.download = `propostas-crm-${hojeISO()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -1300,10 +1349,7 @@
         try {
           const data = JSON.parse(ev.target.result);
           if (Array.isArray(data)) {
-            propostas = data.map((p) => ({
-              ...p,
-              valor: parseValor(p.valor),
-            }));
+            propostas = data.map(normalizarProposta);
             salvarPropostas();
             aplicarFiltros();
           } else {
@@ -1319,6 +1365,8 @@
   });
 
   // ---------- INICIALIZA ----------
+  // deixa inputs desabilitados inicialmente até marcar checkbox
+  syncDisabledByCheck();
   aplicarFiltros();
 </script>
 </body>
