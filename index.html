@@ -717,13 +717,11 @@
   function apenasDigitos(s) { return (s || "").toString().replace(/\D/g, ""); }
 
   // MODO INTEIRO: "1500" -> R$ 1.500,00
-  function maskMoedaInteiro(el) {
-    const raw = apenasDigitos(el.value);
-    const numero = raw ? Number(raw) : 0;
-    el.dataset.number = String(numero);
-    el.value = raw ? formatarMoeda(numero) : "";
-  }
-
+ function maskMoedaInteiro(el) {
+  const numero = parseValor(el.value); // entende "R$ 3.000,00" como 3000
+  el.dataset.number = String(numero || 0);
+  el.value = numero ? formatarMoeda(numero) : "";
+}
   function setMoeda(el, numero) {
     const n = Number(numero) || 0;
     el.dataset.number = String(n);
