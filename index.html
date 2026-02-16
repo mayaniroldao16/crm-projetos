@@ -409,7 +409,7 @@
         <strong id="kpi-valor-aberto">R$ 0,00</strong>
       </div>
 
-      <!-- KPIs extras (item 6) -->
+      <!-- KPIs extras -->
       <div class="kpi-subrow">
         <div class="kpi-mini">
           <div class="kpi-label">Conversão</div>
@@ -434,6 +434,16 @@
         <div class="kpi-mini">
           <div class="kpi-label">Última atualização</div>
           <div class="kpi-value" id="kpi-updated">—</div>
+        </div>
+
+        <!-- KPIs internos -->
+        <div class="kpi-mini">
+          <div class="kpi-label">Interno vencido</div>
+          <div class="kpi-value" id="kpi-interno-vencido">0</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-label">Interno (até 7 dias)</div>
+          <div class="kpi-value" id="kpi-interno-ate7">0</div>
         </div>
       </div>
     </section>
@@ -464,6 +474,15 @@
               <option value="antigas">Mais antigas</option>
               <option value="maior-valor">Maior valor</option>
               <option value="menor-valor">Menor valor</option>
+              <option value="prazo-interno">Prazo interno (mais próximo)</option>
+            </select>
+
+            <select class="select" id="filtro-prazo-interno">
+              <option value="todos">Prazos internos: todos</option>
+              <option value="vencidos">Vencidos</option>
+              <option value="hoje">Vencem hoje</option>
+              <option value="ate7">Até 7 dias</option>
+              <option value="ate30">Até 30 dias</option>
             </select>
           </div>
         </div>
@@ -498,6 +517,7 @@
           <th>Status</th>
           <th>Entrada</th>
           <th>Prazo</th>
+          <th>Prazo Interno</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -515,7 +535,6 @@
     </div>
 
     <div class="modal-body">
-      <!-- (item 5) campos extras -->
       <div class="modal-row">
         <div>
           <label for="novo-numero">Número da proposta</label>
@@ -607,8 +626,20 @@
           <input id="novo-data-entrada" type="date" />
         </div>
         <div>
-          <label for="novo-prazo">Prazo</label>
+          <label for="novo-prazo">Prazo (cliente)</label>
           <input id="novo-prazo" type="date" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div>
+          <label for="novo-prazo-interno">Prazo interno</label>
+          <input id="novo-prazo-interno" type="date" />
+        </div>
+        <div>
+          <label for="novo-alerta-dias">Alerta interno (dias)</label>
+          <input id="novo-alerta-dias" type="number" min="0" step="1" placeholder="3" />
+          <div class="help-hint">Ex.: 3 = destacar quando faltar 3 dias (ou menos) para o prazo interno.</div>
         </div>
       </div>
     </div>
@@ -622,11 +653,11 @@
 
 <script>
   // =========================================================
-  //  (ITENS APLICADOS)
-  //  1) MOEDA AUTOMÁTICA (R$) NOS CAMPOS DE VALOR
-  //  3) CONTROLE DE STATUS (BOTÕES RÁPIDOS + CONFIRMAÇÃO)
-  //  5) CAMPOS EXTRAS (Nº, CIDADE/UF, RESPONSÁVEL)
-  //  6) DASHBOARD (CONVERSÃO, TICKET MÉDIO, VALOR GANHO/PERDIDO)
+  //  + CONTROLE DE PRAZOS INTERNOS
+  //  - prazoInterno (data) + alertaDias (número)
+  //  - filtro e ordenação por prazo interno
+  //  - coluna na tabela com tag (vencido/hoje/próximo/em dia)
+  //  - KPIs: interno vencido / interno até 7 dias
   // =========================================================
 
   // ---------- UTILIDADES ----------
@@ -660,13 +691,32 @@
     return `${hh}:${mm}`;
   }
 
-  // ---------- MOEDA AUTOMÁTICA (item 1) ----------
-  // Converte "1500" em "R$ 15,00"? Não: aqui a regra é "centavos" padrão:
-  // digitou 1500 -> R$ 15,00. Para comportamento "1500 -> 1.500,00", use modo inteiro.
-  // Como você usa propostas, é melhor "1500 -> 1.500,00". Então: MODO INTEIRO.
+  // ---------- PRAZO INTERNO (helpers) ----------
+  function diffDias(isoData) {
+    if (!isoData) return null;
+    const hoje = new Date(hojeISO() + "T00:00:00");
+    const alvo = new Date(isoData + "T00:00:00");
+    const ms = alvo - hoje;
+    return Math.round(ms / (1000 * 60 * 60 * 24));
+  }
+
+  function classPrazoInterno(p) {
+    const dias = diffDias(p.prazoInterno);
+    if (dias === null) return { label: "—", cls: "tag-ganha" };
+
+    if (dias < 0) return { label: `Vencido (${Math.abs(dias)}d)`, cls: "tag-perdida" };
+    if (dias === 0) return { label: "Vence hoje", cls: "tag-atrasada" };
+
+    const alerta = Number.isFinite(Number(p.alertaDias)) ? Number(p.alertaDias) : 3;
+    if (dias <= alerta) return { label: `Próximo (${dias}d)`, cls: "tag-atrasada" };
+
+    return { label: `Em dia (${dias}d)`, cls: "tag-ganha" };
+  }
+
+  // ---------- MOEDA AUTOMÁTICA ----------
   function apenasDigitos(s) { return (s || "").toString().replace(/\D/g, ""); }
 
-  // MODO INTEIRO: "1500" -> 1500.00
+  // MODO INTEIRO: "1500" -> R$ 1.500,00
   function maskMoedaInteiro(el) {
     const raw = apenasDigitos(el.value);
     const numero = raw ? Number(raw) : 0;
@@ -681,7 +731,7 @@
   }
 
   // ---------- DADOS / LOCALSTORAGE ----------
-  const STORAGE_KEY = "crm_propostas_roldao_v2";
+  const STORAGE_KEY = "crm_propostas_roldao_v3_prazo_interno";
 
   function carregarPropostas() {
     try {
@@ -700,7 +750,7 @@
 
   let propostas = carregarPropostas();
 
-  // Migração simples se vier de versões antigas:
+  // Migração / normalização
   function normalizarProposta(p) {
     const serv = p.servicos || {
       baixa: parseValor(p.baixa),
@@ -731,6 +781,9 @@
       status: p.status || "Aberta",
       dataEntrada: p.dataEntrada || p.data || hojeISO(),
       prazo: p.prazo || "",
+      // novos campos:
+      prazoInterno: p.prazoInterno || "",
+      alertaDias: (p.alertaDias != null && p.alertaDias !== "") ? Number(p.alertaDias) : 3,
       updatedAt: p.updatedAt || "",
     };
   }
@@ -752,11 +805,12 @@
         status: "Aberta",
         dataEntrada: hojeISO(),
         prazo: hojeISO(),
+        prazoInterno: hojeISO(),
+        alertaDias: 3,
       }),
     ];
     salvarPropostas();
   } else {
-    // garante que todas estão normalizadas no storage
     salvarPropostas();
   }
 
@@ -801,7 +855,7 @@
     inputTotal.value = total ? formatarMoeda(total) : "";
   }
 
-  // ---------- KPIs (item 6) ----------
+  // ---------- KPIs ----------
   function atualizarKpis(lista) {
     const total = lista.length;
     const abertas = lista.filter((p) => p.status === "Aberta").length;
@@ -827,6 +881,13 @@
     const conversao = denom > 0 ? (ganhas / denom) * 100 : 0;
     const ticket = ganhas > 0 ? (valorGanho / ganhas) : 0;
 
+    // prazos internos (KPI)
+    const internoVencido = lista.filter(p => p.prazoInterno && diffDias(p.prazoInterno) < 0).length;
+    const internoAte7 = lista.filter(p => {
+      const d = diffDias(p.prazoInterno);
+      return d !== null && d >= 0 && d <= 7;
+    }).length;
+
     document.getElementById("kpi-total").textContent = total;
     document.getElementById("kpi-abertas").textContent = abertas;
     document.getElementById("kpi-ganhas").textContent = ganhas;
@@ -838,6 +899,9 @@
     document.getElementById("kpi-ticket").textContent = formatarMoeda(ticket);
     document.getElementById("kpi-valor-ganho").textContent = formatarMoeda(valorGanho);
     document.getElementById("kpi-valor-perdido").textContent = formatarMoeda(valorPerdido);
+
+    document.getElementById("kpi-interno-vencido").textContent = internoVencido;
+    document.getElementById("kpi-interno-ate7").textContent = internoAte7;
 
     const pill = document.getElementById("pill-atrasadas");
     pill.classList.remove("ok", "bad");
@@ -879,12 +943,11 @@
     return c || uf;
   }
 
-  // (item 3) ações rápidas de status
   function atualizarTabela(lista) {
     const tbody = document.getElementById("tabela-propostas");
     if (lista.length === 0) {
       tbody.innerHTML =
-        '<tr><td colspan="11" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
+        '<tr><td colspan="12" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
       return;
     }
 
@@ -902,6 +965,13 @@
           ? ""
           : `<button class="btn-table danger btn-marcar" data-id="${p.id}" data-status="Perdida">Marcar perdida</button>`;
 
+        const pi = classPrazoInterno(p);
+
+        const prazoInternoCell = p.prazoInterno
+          ? `<span class="tag-status ${pi.cls}">${pi.label}</span>
+             <div style="color:#a1a5b5; font-size:0.7rem; margin-top:0.15rem;">${p.prazoInterno}</div>`
+          : `<span class="tag-status tag-ganha">—</span>`;
+
         return `
           <tr>
             <td>${num}</td>
@@ -914,6 +984,7 @@
             <td>${linhaStatusTag(p.status, p.prazo)}</td>
             <td>${p.dataEntrada || ""}</td>
             <td>${p.prazo || ""}</td>
+            <td>${prazoInternoCell}</td>
             <td>
               <button class="btn-table btn-editar" data-id="${p.id}">Editar</button>
               ${btnGanha}
@@ -1032,12 +1103,14 @@
   const inputBusca = document.getElementById("filtro-busca");
   const selectEtapa = document.getElementById("filtro-etapa");
   const selectOrdenar = document.getElementById("filtro-ordenar");
+  const selectPrazoInterno = document.getElementById("filtro-prazo-interno");
   const infoFiltros = document.getElementById("info-filtros");
 
   function aplicarFiltros() {
     const busca = inputBusca.value.trim().toLowerCase();
     const etapa = selectEtapa.value;
     const ordenar = selectOrdenar.value;
+    const filtroPrazoInterno = selectPrazoInterno ? selectPrazoInterno.value : "todos";
 
     let lista = [...propostas];
 
@@ -1064,11 +1137,35 @@
       });
     }
 
+    if (filtroPrazoInterno !== "todos") {
+      lista = lista.filter((p) => {
+        const dias = diffDias(p.prazoInterno);
+        if (dias === null) return false;
+
+        if (filtroPrazoInterno === "vencidos") return dias < 0;
+        if (filtroPrazoInterno === "hoje") return dias === 0;
+        if (filtroPrazoInterno === "ate7") return dias >= 0 && dias <= 7;
+        if (filtroPrazoInterno === "ate30") return dias >= 0 && dias <= 30;
+        return true;
+      });
+    }
+
     lista.sort((a, b) => {
       if (ordenar === "recentes") return (b.dataEntrada || "").localeCompare(a.dataEntrada || "");
       if (ordenar === "antigas") return (a.dataEntrada || "").localeCompare(b.dataEntrada || "");
       if (ordenar === "maior-valor") return parseValor(b.valor) - parseValor(a.valor);
       if (ordenar === "menor-valor") return parseValor(a.valor) - parseValor(b.valor);
+
+      if (ordenar === "prazo-interno") {
+        const da = diffDias(a.prazoInterno);
+        const db = diffDias(b.prazoInterno);
+
+        if (da === null && db === null) return 0;
+        if (da === null) return 1;
+        if (db === null) return -1;
+
+        return da - db; // mais próximo primeiro (vencidos vêm antes)
+      }
       return 0;
     });
 
@@ -1078,10 +1175,22 @@
       const mapa = { aberta: "Abertas", ganha: "Ganhas", perdida: "Perdidas/Canceladas" };
       partes.push(`Etapa: ${mapa[etapa] || ""}`);
     }
+
     if (ordenar === "recentes") partes.push("Ordenado: mais recentes");
     if (ordenar === "antigas") partes.push("Ordenado: mais antigas");
     if (ordenar === "maior-valor") partes.push("Ordenado: maior valor");
     if (ordenar === "menor-valor") partes.push("Ordenado: menor valor");
+    if (ordenar === "prazo-interno") partes.push("Ordenado: prazo interno");
+
+    if (filtroPrazoInterno !== "todos") {
+      const mapaPI = {
+        vencidos: "Interno: vencidos",
+        hoje: "Interno: hoje",
+        ate7: "Interno: até 7 dias",
+        ate30: "Interno: até 30 dias"
+      };
+      partes.push(mapaPI[filtroPrazoInterno] || "Interno: filtro");
+    }
 
     infoFiltros.innerHTML =
       partes.length === 0
@@ -1096,6 +1205,7 @@
   inputBusca.addEventListener("input", aplicarFiltros);
   selectEtapa.addEventListener("change", aplicarFiltros);
   selectOrdenar.addEventListener("change", aplicarFiltros);
+  selectPrazoInterno.addEventListener("change", aplicarFiltros);
 
   // ---------- MODAL NOVA/EDITAR PROPOSTA ----------
   const modalBackdrop = document.getElementById("modal-backdrop");
@@ -1129,6 +1239,10 @@
     document.getElementById("novo-status").value = "Aberta";
     document.getElementById("novo-data-entrada").value = "";
     document.getElementById("novo-prazo").value = "";
+
+    // novos campos:
+    document.getElementById("novo-prazo-interno").value = "";
+    document.getElementById("novo-alerta-dias").value = "3";
   }
 
   function abrirModalNovo() {
@@ -1177,6 +1291,10 @@
     document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
     document.getElementById("novo-prazo").value = proposta.prazo || "";
 
+    // novos campos:
+    document.getElementById("novo-prazo-interno").value = proposta.prazoInterno || "";
+    document.getElementById("novo-alerta-dias").value = (proposta.alertaDias ?? 3);
+
     preencherServicosNoModal(proposta);
 
     modalBackdrop.style.display = "flex";
@@ -1209,6 +1327,9 @@
     const dataEntrada = document.getElementById("novo-data-entrada").value || hojeISO();
     const prazo = document.getElementById("novo-prazo").value;
 
+    const prazoInterno = document.getElementById("novo-prazo-interno").value;
+    const alertaDias = document.getElementById("novo-alerta-dias").value;
+
     if (!cliente) {
       alert("Informe o nome do cliente.");
       return;
@@ -1218,13 +1339,11 @@
     const servicosObj = { baixa, media, cftv, cabeamento };
     const valor = total;
 
-    // (item 1) evita salvar sem valor
     if (!valor || valor <= 0) {
       alert("Informe ao menos um serviço com valor maior que zero.");
       return;
     }
 
-    // (item 3) confirmação para perdida/cancelada
     if (status.startsWith("Perdida")) {
       const ok = confirm("Confirmar: salvar esta proposta como Perdida / Cancelada?");
       if (!ok) return;
@@ -1246,6 +1365,8 @@
         status,
         dataEntrada,
         prazo,
+        prazoInterno,
+        alertaDias,
         updatedAt,
       });
       propostas.push(novo);
@@ -1265,6 +1386,8 @@
           status,
           dataEntrada,
           prazo,
+          prazoInterno,
+          alertaDias,
           updatedAt,
         });
       }
@@ -1302,9 +1425,7 @@
   servicoInputs.forEach((id) => {
     const el = document.getElementById(id);
 
-    // moeda automática em modo inteiro: "1500" -> R$ 1.500,00
     el.addEventListener("input", () => {
-      // se o usuário começar a digitar com checkbox off, liga
       const map = {
         "val-servico-bt": "chk-servico-bt",
         "val-servico-mt": "chk-servico-mt",
@@ -1316,11 +1437,10 @@
       if (!chk.checked && apenasDigitos(el.value).length > 0) chk.checked = true;
 
       maskMoedaInteiro(el);
-      syncDisabledByCheck(); // atualiza total e disabled
+      syncDisabledByCheck();
     });
 
     el.addEventListener("blur", () => {
-      // mantém formatado
       maskMoedaInteiro(el);
       atualizarValorTotalUI();
     });
@@ -1365,7 +1485,6 @@
   });
 
   // ---------- INICIALIZA ----------
-  // deixa inputs desabilitados inicialmente até marcar checkbox
   syncDisabledByCheck();
   aplicarFiltros();
 </script>
