@@ -1421,29 +1421,38 @@ function maskMoedaInteiro(el) {
     document.getElementById(id).addEventListener("change", syncDisabledByCheck);
   });
 
-  servicoInputs.forEach((id) => {
-    const el = document.getElementById(id);
+servicoInputs.forEach((id) => {
+  const el = document.getElementById(id);
 
-    el.addEventListener("input", () => {
-      const map = {
-        "val-servico-bt": "chk-servico-bt",
-        "val-servico-mt": "chk-servico-mt",
-        "val-servico-cftv": "chk-servico-cftv",
-        "val-servico-cab": "chk-servico-cab",
-      };
-      const chkId = map[id];
-      const chk = document.getElementById(chkId);
-      if (!chk.checked && parseValor(el.value) > 0) chk.checked = true;
-
-      maskMoedaInteiro(el);
-      syncDisabledByCheck();
-    });
-
-    el.addEventListener("blur", () => {
-      maskMoedaInteiro(el);
-      atualizarValorTotalUI();
-    });
+  el.addEventListener("focus", () => {
+    const n = parseValor(el.value);
+    el.value = n ? String(n) : "";
+    el.select();
   });
+
+  el.addEventListener("input", () => {
+    const map = {
+      "val-servico-bt": "chk-servico-bt",
+      "val-servico-mt": "chk-servico-mt",
+      "val-servico-cftv": "chk-servico-cftv",
+      "val-servico-cab": "chk-servico-cab",
+    };
+
+    const chkId = map[id];
+    const chk = document.getElementById(chkId);
+
+    if (!chk.checked && parseValor(el.value) > 0) chk.checked = true;
+
+    maskMoedaInteiro(el);
+    syncDisabledByCheck();
+  });
+
+  el.addEventListener("blur", () => {
+    maskMoedaInteiro(el);
+    atualizarValorTotalUI();
+  });
+});
+
 
   // ---------- EXPORTAR / IMPORTAR ----------
   document.getElementById("btn-exportar").addEventListener("click", () => {
