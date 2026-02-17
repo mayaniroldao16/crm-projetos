@@ -134,7 +134,7 @@
     }
     .card-title { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 0.75rem; }
 
-    /* VISÃO GERAL (KPIs extras) */
+    /* VISÃO GERAL */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -409,7 +409,6 @@
         <strong id="kpi-valor-aberto">R$ 0,00</strong>
       </div>
 
-      <!-- KPIs extras -->
       <div class="kpi-subrow">
         <div class="kpi-mini">
           <div class="kpi-label">Conversão</div>
@@ -436,7 +435,6 @@
           <div class="kpi-value" id="kpi-updated">—</div>
         </div>
 
-        <!-- KPIs internos -->
         <div class="kpi-mini">
           <div class="kpi-label">Interno vencido</div>
           <div class="kpi-value" id="kpi-interno-vencido">0</div>
@@ -625,6 +623,7 @@
           <label for="novo-data-entrada">Data de entrada</label>
           <input id="novo-data-entrada" type="date" />
         </div>
+
         <div>
           <label for="novo-prazo-dias">Prazo (cliente) - dias</label>
           <input id="novo-prazo-dias" type="number" min="0" step="1" placeholder="Ex: 45" />
@@ -658,9 +657,11 @@
 
 <script>
   // =========================================================
-  //  + CONTROLE DE PRAZOS INTERNOS
-  //  + PRAZO CLIENTE EM DIAS + PREVIEW (verde / amarelo<=10 / vermelho vencido)
-  //  + MOEDA: NÃO FORMATAR DURANTE DIGITAÇÃO (formata no blur)
+  //  ✅ Ajustes incluídos:
+  //  - Serviços: não soma 1000 / não explode valor (sem formatar durante digitação; formata no blur)
+  //  - Prazo cliente: campo em dias + preview da data final (verde / amarelo <=10 / vermelho vencido)
+  //  - Salvar: grava "prazo" como data final (ISO) calculada por (dataEntrada + dias)
+  //  - Prazo interno: mantém tags e KPI (vencido / até 7 dias)
   // =========================================================
 
   // ---------- UTILIDADES ----------
@@ -694,6 +695,13 @@
     return `${hh}:${mm}`;
   }
 
+  function formatarDataBR(iso) {
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-");
+    if (!y || !m || !d) return iso;
+    return `${d}/${m}/${y}`;
+  }
+
   // ---------- PRAZOS (helpers) ----------
   function diffDias(isoData) {
     if (!isoData) return null;
@@ -707,23 +715,15 @@
     if (!dataISO) return "";
     const n = Number(dias);
     if (!Number.isFinite(n)) return "";
-
     const base = new Date(dataISO + "T00:00:00");
     base.setDate(base.getDate() + n);
     return base.toISOString().slice(0, 10);
-  }
-
-  function formatarDataBR(iso) {
-    if (!iso) return "—";
-    const [ano, mes, dia] = iso.split("-");
-    return `${dia}/${mes}/${ano}`;
   }
 
   // prazo interno: label + classe
   function classPrazoInterno(p) {
     const dias = diffDias(p.prazoInterno);
     if (dias === null) return { label: "—", cls: "tag-ganha" };
-
     if (dias < 0) return { label: `Vencido (${Math.abs(dias)}d)`, cls: "tag-perdida" };
     if (dias === 0) return { label: "Vence hoje", cls: "tag-atrasada" };
 
@@ -820,8 +820,8 @@
         servicos: { baixa: 3000, media: 0, cftv: 2500, cabeamento: 0 },
         status: "Aberta",
         dataEntrada: hojeISO(),
-        prazo: hojeISO(),
-        prazoInterno: hojeISO(),
+        prazo: addDiasISO(hojeISO(), 10),
+        prazoInterno: addDiasISO(hojeISO(), 3),
         alertaDias: 3,
       }),
     ];
@@ -929,7 +929,6 @@
       pill.classList.add("bad");
     }
 
-    // última atualização (maior updatedAt)
     const updated = lista
       .map(p => p.updatedAt || "")
       .filter(Boolean)
@@ -1258,11 +1257,10 @@
 
     previewPrazoFinal.textContent = formatarDataBR(prazoFinal);
 
-    // cores: vermelho vencido / amarelo <=10 dias / verde >10 dias
     const d = diffDias(prazoFinal);
     if (d !== null) {
       if (d < 0) previewPrazoFinal.classList.add("tag-perdida");
-      else if (d <= 10) previewPrazoFinal.classList.add("tag-atrasada");
+      else if (d <= 10) previewPrazoFinal.classList.add("tag-atrasada"); // <= 10 dias (amarelo)
       else previewPrazoFinal.classList.add("tag-ganha");
     } else {
       previewPrazoFinal.classList.add("tag-ganha");
@@ -1314,8 +1312,6 @@
     limparCamposModal();
     modalBackdrop.style.display = "flex";
     document.getElementById("novo-cliente").focus();
-
-    // garante preview consistente
     atualizarPrazoFinalPreview();
   }
 
@@ -1367,7 +1363,6 @@
     }
     document.getElementById("novo-prazo-dias").value = diasCalc;
 
-    // prazo interno
     document.getElementById("novo-prazo-interno").value = proposta.prazoInterno || "";
     document.getElementById("novo-alerta-dias").value = (proposta.alertaDias ?? 3);
 
@@ -1504,7 +1499,7 @@
     });
   });
 
-  // IMPORTANTE: não formatar no "input", só no blur (evita escalar/somar)
+  // ✅ Não formatar no "input" (evita somar / explodir valor). Formata no blur.
   servicoInputs.forEach((id) => {
     const el = document.getElementById(id);
 
@@ -1515,7 +1510,6 @@
     });
 
     el.addEventListener("input", () => {
-      // mantém só dígitos durante digitação
       el.value = apenasDigitos(el.value);
 
       const map = {
@@ -1525,10 +1519,8 @@
         "val-servico-cab": "chk-servico-cab",
       };
       const chk = document.getElementById(map[id]);
-
       if (!chk.checked && el.value.length > 0) chk.checked = true;
 
-      // atualiza total (sem formatar o campo)
       syncDisabledByCheck();
     });
 
