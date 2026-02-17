@@ -601,7 +601,7 @@
           </div>
         </div>
         <div class="help-hint">
-          Dica: digite normalmente (ex: 1500) que o campo vira <b>R$ 1.500,00</b>.
+          Dica: digite normalmente (ex: 1500) e ao sair do campo vira <b>R$ 1.500,00</b>.
         </div>
       </div>
 
@@ -626,8 +626,13 @@
           <input id="novo-data-entrada" type="date" />
         </div>
         <div>
-          <label for="novo-prazo">Prazo (cliente)</label>
-          <input id="novo-prazo" type="date" />
+          <label for="novo-prazo-dias">Prazo (cliente) - dias</label>
+          <input id="novo-prazo-dias" type="number" min="0" step="1" placeholder="Ex: 45" />
+          <div class="help-hint">Ao digitar, calculamos automaticamente a data final (Data de entrada + dias).</div>
+          <div class="help-hint" style="margin-top:6px;">
+            Prazo final:
+            <strong id="preview-prazo-final" class="tag-status tag-ganha">—</strong>
+          </div>
         </div>
       </div>
 
@@ -654,10 +659,8 @@
 <script>
   // =========================================================
   //  + CONTROLE DE PRAZOS INTERNOS
-  //  - prazoInterno (data) + alertaDias (número)
-  //  - filtro e ordenação por prazo interno
-  //  - coluna na tabela com tag (vencido/hoje/próximo/em dia)
-  //  - KPIs: interno vencido / interno até 7 dias
+  //  + PRAZO CLIENTE EM DIAS + PREVIEW (verde / amarelo<=10 / vermelho vencido)
+  //  + MOEDA: NÃO FORMATAR DURANTE DIGITAÇÃO (formata no blur)
   // =========================================================
 
   // ---------- UTILIDADES ----------
@@ -691,7 +694,7 @@
     return `${hh}:${mm}`;
   }
 
-  // ---------- PRAZO INTERNO (helpers) ----------
+  // ---------- PRAZOS (helpers) ----------
   function diffDias(isoData) {
     if (!isoData) return null;
     const hoje = new Date(hojeISO() + "T00:00:00");
@@ -700,6 +703,23 @@
     return Math.round(ms / (1000 * 60 * 60 * 24));
   }
 
+  function addDiasISO(dataISO, dias) {
+    if (!dataISO) return "";
+    const n = Number(dias);
+    if (!Number.isFinite(n)) return "";
+
+    const base = new Date(dataISO + "T00:00:00");
+    base.setDate(base.getDate() + n);
+    return base.toISOString().slice(0, 10);
+  }
+
+  function formatarDataBR(iso) {
+    if (!iso) return "—";
+    const [ano, mes, dia] = iso.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  // prazo interno: label + classe
   function classPrazoInterno(p) {
     const dias = diffDias(p.prazoInterno);
     if (dias === null) return { label: "—", cls: "tag-ganha" };
@@ -713,15 +733,14 @@
     return { label: `Em dia (${dias}d)`, cls: "tag-ganha" };
   }
 
-  // ---------- MOEDA AUTOMÁTICA ----------
+  // ---------- MOEDA ----------
   function apenasDigitos(s) { return (s || "").toString().replace(/\D/g, ""); }
 
-  // MODO INTEIRO: "1500" -> R$ 1.500,00
-function maskMoedaInteiro(el) {
-  const numero = parseValor(el.value); // entende "R$ 3.000,00" como 3000
-  el.dataset.number = String(numero || 0);
-  el.value = numero ? formatarMoeda(numero) : "";
-}
+  function maskMoedaInteiro(el) {
+    const numero = parseValor(el.value);
+    el.dataset.number = String(numero || 0);
+    el.value = numero ? formatarMoeda(numero) : "";
+  }
 
   function setMoeda(el, numero) {
     const n = Number(numero) || 0;
@@ -779,8 +798,7 @@ function maskMoedaInteiro(el) {
       valor,
       status: p.status || "Aberta",
       dataEntrada: p.dataEntrada || p.data || hojeISO(),
-      prazo: p.prazo || "",
-      // novos campos:
+      prazo: p.prazo || "",                 // PRAZO CLIENTE (data final ISO)
       prazoInterno: p.prazoInterno || "",
       alertaDias: (p.alertaDias != null && p.alertaDias !== "") ? Number(p.alertaDias) : 3,
       updatedAt: p.updatedAt || "",
@@ -789,7 +807,6 @@ function maskMoedaInteiro(el) {
 
   propostas = propostas.map(normalizarProposta);
 
-  // se estiver vazio, cria um exemplo
   if (propostas.length === 0) {
     propostas = [
       normalizarProposta({
@@ -1027,7 +1044,7 @@ function maskMoedaInteiro(el) {
     aplicarFiltros();
   }
 
-  // ---------- GRÁFICO EM PIZZA ----------
+  // ---------- GRÁFICO ----------
   let chartValores = null;
 
   function somarValoresPorStatus(lista) {
@@ -1163,7 +1180,7 @@ function maskMoedaInteiro(el) {
         if (da === null) return 1;
         if (db === null) return -1;
 
-        return da - db; // mais próximo primeiro (vencidos vêm antes)
+        return da - db;
       }
       return 0;
     });
@@ -1206,7 +1223,7 @@ function maskMoedaInteiro(el) {
   selectOrdenar.addEventListener("change", aplicarFiltros);
   selectPrazoInterno.addEventListener("change", aplicarFiltros);
 
-  // ---------- MODAL NOVA/EDITAR PROPOSTA ----------
+  // ---------- MODAL ----------
   const modalBackdrop = document.getElementById("modal-backdrop");
   const btnNova = document.getElementById("btn-nova");
   const btnFecharModal = document.getElementById("btn-fechar-modal");
@@ -1214,7 +1231,48 @@ function maskMoedaInteiro(el) {
   const btnSalvarModal = document.getElementById("btn-salvar-modal");
   const modalTitulo = document.getElementById("modal-titulo");
 
+  const inputDataEntrada = document.getElementById("novo-data-entrada");
+  const inputPrazoDias = document.getElementById("novo-prazo-dias");
+  const previewPrazoFinal = document.getElementById("preview-prazo-final");
+
   let editingId = null;
+
+  function atualizarPrazoFinalPreview() {
+    previewPrazoFinal.classList.remove("tag-ganha", "tag-atrasada", "tag-perdida");
+
+    const de = inputDataEntrada.value || hojeISO();
+    const dias = inputPrazoDias.value;
+
+    if (dias === "" || !Number.isFinite(Number(dias))) {
+      previewPrazoFinal.textContent = "—";
+      previewPrazoFinal.classList.add("tag-ganha");
+      return "";
+    }
+
+    const prazoFinal = addDiasISO(de, dias);
+    if (!prazoFinal) {
+      previewPrazoFinal.textContent = "—";
+      previewPrazoFinal.classList.add("tag-ganha");
+      return "";
+    }
+
+    previewPrazoFinal.textContent = formatarDataBR(prazoFinal);
+
+    // cores: vermelho vencido / amarelo <=10 dias / verde >10 dias
+    const d = diffDias(prazoFinal);
+    if (d !== null) {
+      if (d < 0) previewPrazoFinal.classList.add("tag-perdida");
+      else if (d <= 10) previewPrazoFinal.classList.add("tag-atrasada");
+      else previewPrazoFinal.classList.add("tag-ganha");
+    } else {
+      previewPrazoFinal.classList.add("tag-ganha");
+    }
+
+    return prazoFinal;
+  }
+
+  inputDataEntrada.addEventListener("change", atualizarPrazoFinalPreview);
+  inputPrazoDias.addEventListener("input", atualizarPrazoFinalPreview);
 
   function limparCamposModal() {
     document.getElementById("novo-numero").value = "";
@@ -1237,9 +1295,14 @@ function maskMoedaInteiro(el) {
     document.getElementById("novo-valor-total").value = "";
     document.getElementById("novo-status").value = "Aberta";
     document.getElementById("novo-data-entrada").value = "";
-    document.getElementById("novo-prazo").value = "";
 
-    // novos campos:
+    // prazo cliente em dias
+    document.getElementById("novo-prazo-dias").value = "";
+    previewPrazoFinal.textContent = "—";
+    previewPrazoFinal.classList.remove("tag-atrasada", "tag-perdida");
+    previewPrazoFinal.classList.add("tag-ganha");
+
+    // prazo interno
     document.getElementById("novo-prazo-interno").value = "";
     document.getElementById("novo-alerta-dias").value = "3";
   }
@@ -1251,6 +1314,9 @@ function maskMoedaInteiro(el) {
     limparCamposModal();
     modalBackdrop.style.display = "flex";
     document.getElementById("novo-cliente").focus();
+
+    // garante preview consistente
+    atualizarPrazoFinalPreview();
   }
 
   function preencherServicosNoModal(proposta) {
@@ -1288,15 +1354,27 @@ function maskMoedaInteiro(el) {
 
     document.getElementById("novo-status").value = proposta.status || "Aberta";
     document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
-    document.getElementById("novo-prazo").value = proposta.prazo || "";
 
-    // novos campos:
+    // preencher "dias" a partir de (prazo - dataEntrada)
+    const de = (proposta.dataEntrada || hojeISO());
+    const pf = (proposta.prazo || "");
+    let diasCalc = "";
+    if (pf && de) {
+      const d1 = new Date(de + "T00:00:00");
+      const d2 = new Date(pf + "T00:00:00");
+      const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+      diasCalc = Number.isFinite(diff) ? String(Math.max(0, diff)) : "";
+    }
+    document.getElementById("novo-prazo-dias").value = diasCalc;
+
+    // prazo interno
     document.getElementById("novo-prazo-interno").value = proposta.prazoInterno || "";
     document.getElementById("novo-alerta-dias").value = (proposta.alertaDias ?? 3);
 
     preencherServicosNoModal(proposta);
 
     modalBackdrop.style.display = "flex";
+    atualizarPrazoFinalPreview();
   }
 
   function fecharModal() {
@@ -1324,7 +1402,10 @@ function maskMoedaInteiro(el) {
     const status = statusRaw === "Perdida" ? "Perdida / Cancelada" : statusRaw;
 
     const dataEntrada = document.getElementById("novo-data-entrada").value || hojeISO();
-    const prazo = document.getElementById("novo-prazo").value;
+
+    // prazo cliente: dias -> data final
+    const prazoDias = document.getElementById("novo-prazo-dias").value;
+    const prazo = (prazoDias !== "" ? addDiasISO(dataEntrada, prazoDias) : "");
 
     const prazoInterno = document.getElementById("novo-prazo-interno").value;
     const alertaDias = document.getElementById("novo-alerta-dias").value;
@@ -1418,41 +1499,44 @@ function maskMoedaInteiro(el) {
   }
 
   servicoChecks.forEach((id) => {
-    document.getElementById(id).addEventListener("change", syncDisabledByCheck);
+    document.getElementById(id).addEventListener("change", () => {
+      syncDisabledByCheck();
+    });
   });
 
-servicoInputs.forEach((id) => {
-  const el = document.getElementById(id);
+  // IMPORTANTE: não formatar no "input", só no blur (evita escalar/somar)
+  servicoInputs.forEach((id) => {
+    const el = document.getElementById(id);
 
-  el.addEventListener("focus", () => {
-    const n = parseValor(el.value);
-    el.value = n ? String(n) : "";
-    el.select();
+    el.addEventListener("focus", () => {
+      const n = parseValor(el.value);
+      el.value = n ? String(n) : "";
+      el.select();
+    });
+
+    el.addEventListener("input", () => {
+      // mantém só dígitos durante digitação
+      el.value = apenasDigitos(el.value);
+
+      const map = {
+        "val-servico-bt": "chk-servico-bt",
+        "val-servico-mt": "chk-servico-mt",
+        "val-servico-cftv": "chk-servico-cftv",
+        "val-servico-cab": "chk-servico-cab",
+      };
+      const chk = document.getElementById(map[id]);
+
+      if (!chk.checked && el.value.length > 0) chk.checked = true;
+
+      // atualiza total (sem formatar o campo)
+      syncDisabledByCheck();
+    });
+
+    el.addEventListener("blur", () => {
+      maskMoedaInteiro(el);
+      atualizarValorTotalUI();
+    });
   });
-
-  el.addEventListener("input", () => {
-    const map = {
-      "val-servico-bt": "chk-servico-bt",
-      "val-servico-mt": "chk-servico-mt",
-      "val-servico-cftv": "chk-servico-cftv",
-      "val-servico-cab": "chk-servico-cab",
-    };
-
-    const chkId = map[id];
-    const chk = document.getElementById(chkId);
-
-    if (!chk.checked && parseValor(el.value) > 0) chk.checked = true;
-
-    maskMoedaInteiro(el);
-    syncDisabledByCheck();
-  });
-
-  el.addEventListener("blur", () => {
-    maskMoedaInteiro(el);
-    atualizarValorTotalUI();
-  });
-});
-
 
   // ---------- EXPORTAR / IMPORTAR ----------
   document.getElementById("btn-exportar").addEventListener("click", () => {
