@@ -161,6 +161,7 @@
       border-radius: var(--radius-full);
       background: var(--accent-soft);
       color: var(--accent-strong);
+      width: fit-content;
     }
     .kpi-pill.ok { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
     .kpi-pill.bad { background: var(--danger-soft); color: var(--danger); }
@@ -336,6 +337,114 @@
       line-height: 1.25;
     }
 
+    /* ===== PM / Project Management timeline (Ganhas) ===== */
+    .pm-panel{
+      margin-top: .9rem;
+      padding: .85rem .9rem;
+      border-radius: var(--radius-lg);
+      background: rgba(9, 12, 30, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    .pm-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.6rem;
+      margin-bottom:.45rem;
+    }
+
+    .pm-title{
+      font-size:.78rem;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
+    .pm-select{
+      max-width: 52%;
+      min-width: 180px;
+    }
+
+    .pm-meta{
+      font-size: .75rem;
+      color: rgba(161, 165, 181, 0.95);
+      margin-bottom: .65rem;
+      line-height: 1.25;
+    }
+
+    .pm-track{
+      position: relative;
+      height: 56px;
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+
+    .pm-line{
+      position:absolute;
+      left: 10px;
+      right: 10px;
+      top: 28px;
+      height: 2px;
+      background: rgba(148, 163, 184, 0.35);
+    }
+
+    .pm-progress{
+      position:absolute;
+      left: 10px;
+      top: 27px;
+      height: 4px;
+      background: rgba(227, 177, 43, 0.95);
+      border-radius: 999px;
+    }
+
+    .pm-marker{
+      position:absolute;
+      top: 22px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, 0.95);
+      background: rgba(148, 163, 184, 0.9);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.45);
+    }
+
+    .pm-start{ left: 8px; background: rgba(34, 197, 94, 0.95); }
+    .pm-end{ right: 8px; background: rgba(239, 68, 68, 0.95); }
+
+    .pm-today{
+      left: 10px; /* reposicionado via JS */
+      background: rgba(250, 204, 107, 0.95);
+    }
+
+    .pm-label{
+      position:absolute;
+      top: 6px;
+      font-size: .68rem;
+      color: rgba(229, 231, 235, 0.92);
+      white-space: nowrap;
+    }
+
+    .pm-label-start{ left: 10px; }
+    .pm-label-end{ right: 10px; }
+
+    .pm-label-today{
+      top: 38px;
+      transform: translateX(-50%);
+      color: rgba(161, 165, 181, 0.95);
+    }
+
+    .pm-footer{
+      margin-top: .55rem;
+      display:flex;
+      justify-content: space-between;
+      gap: .6rem;
+      flex-wrap: wrap;
+      font-size: .75rem;
+      color: rgba(161, 165, 181, 0.95);
+    }
+
     /* RESPONSIVO */
     @media (max-width: 980px) {
       .grid-top { grid-template-columns: minmax(0, 1fr); }
@@ -349,6 +458,7 @@
       .kpi-subrow { grid-template-columns: repeat(1, minmax(0, 1fr)); }
       .filters-top { flex-direction: column; align-items: stretch; }
       .modal-row { grid-template-columns: 1fr; }
+      .pm-select { max-width: 100%; width: 100%; }
     }
   </style>
 </head>
@@ -477,6 +587,32 @@
         </div>
 
         <div class="filters-badges" id="info-filtros"></div>
+
+        <!-- PM / Project Management - Cronograma (Ganhas) -->
+        <div class="pm-panel" id="pm-panel" style="display:none;">
+          <div class="pm-head">
+            <div class="pm-title">Cronograma (Propostas ganhas)</div>
+            <select class="select pm-select" id="pm-select"></select>
+          </div>
+
+          <div class="pm-meta" id="pm-meta">—</div>
+
+          <div class="pm-track">
+            <div class="pm-line"></div>
+
+            <div class="pm-progress" id="pm-progress" style="width:0%"></div>
+
+            <div class="pm-marker pm-start" title="Início"></div>
+            <div class="pm-marker pm-today" id="pm-today" title="Hoje"></div>
+            <div class="pm-marker pm-end" title="Prazo final"></div>
+
+            <div class="pm-label pm-label-start" id="pm-label-start">—</div>
+            <div class="pm-label pm-label-today" id="pm-label-today">Hoje</div>
+            <div class="pm-label pm-label-end" id="pm-label-end">—</div>
+          </div>
+
+          <div class="pm-footer" id="pm-footer">—</div>
+        </div>
       </div>
     </section>
   </div>
@@ -574,9 +710,7 @@
             <input type="text" id="val-servico-cab" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
         </div>
-        <div class="help-hint">
-          Dica: digite normalmente (ex: 1500) e ao sair do campo vira <b>R$ 1.500,00</b>.
-        </div>
+        <div class="help-hint">Dica: digite normalmente (ex: 1500) e ao sair do campo vira <b>R$ 1.500,00</b>.</div>
       </div>
 
       <div class="modal-row">
@@ -599,7 +733,6 @@
           <label for="novo-data-entrada">Data de entrada</label>
           <input id="novo-data-entrada" type="date" />
         </div>
-
         <div>
           <label for="novo-prazo-dias">Prazo (cliente) - dias</label>
           <input id="novo-prazo-dias" type="number" min="0" step="1" placeholder="Ex: 45" />
@@ -633,10 +766,13 @@
 
 <script>
   // =========================================================
-  //  ✅ Ajustes finais incluídos:
-  //  - Botão Excluir funcionando
-  //  - Colspan correto quando não há dados
-  //  - Listener do "Excluir" adicionado no lugar certo (após renderizar a tabela)
+  // ✅ Inclui:
+  // - Prazo cliente em dias (salva data final em "prazo")
+  // - Preview do prazo final (verde / amarelo <=10 / vermelho vencido)
+  // - Moeda: não formatar durante digitação (formata no blur)
+  // - Prazo interno + KPIs
+  // - Botão Excluir (na tabela) + ações por delegação
+  // - Cronograma PM (Project Management) para propostas GANHAS
   // =========================================================
 
   // ---------- UTILIDADES ----------
@@ -721,7 +857,7 @@
     el.value = n ? formatarMoeda(n) : "";
   }
 
-  // ---------- DADOS / LOCALSTORAGE ----------
+  // ---------- STORAGE ----------
   const STORAGE_KEY = "crm_propostas_roldao_v3_prazo_interno";
 
   function carregarPropostas() {
@@ -770,7 +906,7 @@
       valor,
       status: p.status || "Aberta",
       dataEntrada: p.dataEntrada || p.data || hojeISO(),
-      prazo: p.prazo || "",
+      prazo: p.prazo || "", // data final ISO
       prazoInterno: p.prazoInterno || "",
       alertaDias: (p.alertaDias != null && p.alertaDias !== "") ? Number(p.alertaDias) : 3,
       updatedAt: p.updatedAt || "",
@@ -804,16 +940,13 @@
 
   // ---------- SERVIÇOS ----------
   function descricaoServicos(p) {
-    if (p.servicos) {
-      const s = p.servicos;
-      const nomes = [];
-      if (parseValor(s.baixa) > 0) nomes.push("Elétrico Baixa Tensão");
-      if (parseValor(s.media) > 0) nomes.push("Elétrico Média Tensão");
-      if (parseValor(s.cftv) > 0) nomes.push("CFTV");
-      if (parseValor(s.cabeamento) > 0) nomes.push("Cabeamento Estruturado");
-      return nomes.join(", ") || "-";
-    }
-    return p.servico || "-";
+    const s = p.servicos || {};
+    const nomes = [];
+    if (parseValor(s.baixa) > 0) nomes.push("Elétrico Baixa Tensão");
+    if (parseValor(s.media) > 0) nomes.push("Elétrico Média Tensão");
+    if (parseValor(s.cftv) > 0) nomes.push("CFTV");
+    if (parseValor(s.cabeamento) > 0) nomes.push("Cabeamento Estruturado");
+    return nomes.join(", ") || "-";
   }
 
   function obterServicosDaUI() {
@@ -851,17 +984,9 @@
     const hoje = hojeISO();
     const atrasadas = lista.filter((p) => p.status === "Aberta" && p.prazo && p.prazo < hoje).length;
 
-    const valorAberto = lista
-      .filter((p) => p.status === "Aberta")
-      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
-
-    const valorGanho = lista
-      .filter((p) => p.status === "Ganha")
-      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
-
-    const valorPerdido = lista
-      .filter((p) => p.status && p.status.startsWith("Perdida"))
-      .reduce((acc, p) => acc + (parseValor(p.valor) || 0), 0);
+    const valorAberto = lista.filter((p) => p.status === "Aberta").reduce((acc, p) => acc + parseValor(p.valor), 0);
+    const valorGanho = lista.filter((p) => p.status === "Ganha").reduce((acc, p) => acc + parseValor(p.valor), 0);
+    const valorPerdido = lista.filter((p) => p.status && p.status.startsWith("Perdida")).reduce((acc, p) => acc + parseValor(p.valor), 0);
 
     const denom = (ganhas + perdidas);
     const conversao = denom > 0 ? (ganhas / denom) * 100 : 0;
@@ -878,8 +1003,8 @@
     document.getElementById("kpi-ganhas").textContent = ganhas;
     document.getElementById("kpi-perdidas").textContent = perdidas;
     document.getElementById("kpi-atrasadas").textContent = atrasadas;
-    document.getElementById("kpi-valor-aberto").textContent = formatarMoeda(valorAberto);
 
+    document.getElementById("kpi-valor-aberto").textContent = formatarMoeda(valorAberto);
     document.getElementById("kpi-conversao").textContent = `${conversao.toFixed(0)}%`;
     document.getElementById("kpi-ticket").textContent = formatarMoeda(ticket);
     document.getElementById("kpi-valor-ganho").textContent = formatarMoeda(valorGanho);
@@ -946,7 +1071,6 @@
         : `<button class="btn-table danger btn-marcar" data-id="${p.id}" data-status="Perdida">Marcar perdida</button>`;
 
       const pi = classPrazoInterno(p);
-
       const prazoInternoCell = p.prazoInterno
         ? `<span class="tag-status ${pi.cls}">${pi.label}</span>
            <div style="color:#a1a5b5; font-size:0.7rem; margin-top:0.15rem;">${p.prazoInterno}</div>`
@@ -974,39 +1098,36 @@
         </tr>
       `;
     }).join("");
-
-    // Editar
-    document.querySelectorAll(".btn-editar").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = Number(btn.dataset.id);
-        abrirModalEditar(id);
-      });
-    });
-
-    // Marcar status
-    document.querySelectorAll(".btn-marcar").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = Number(btn.dataset.id);
-        const status = btn.dataset.status;
-        marcarStatusRapido(id, status);
-      });
-    });
-
-    // Excluir
-    document.querySelectorAll(".btn-excluir").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = Number(btn.dataset.id);
-
-        const ok = confirm("Tem certeza que deseja excluir esta proposta?");
-        if (!ok) return;
-
-        propostas = propostas.filter((p) => p.id !== id);
-
-        salvarPropostas();
-        aplicarFiltros();
-      });
-    });
   }
+
+  // ✅ Delegação de eventos: um listener só para ações da tabela
+  document.getElementById("tabela-propostas").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const id = Number(btn.dataset.id);
+    if (!Number.isFinite(id)) return;
+
+    if (btn.classList.contains("btn-editar")) {
+      abrirModalEditar(id);
+      return;
+    }
+
+    if (btn.classList.contains("btn-marcar")) {
+      const status = btn.dataset.status;
+      marcarStatusRapido(id, status);
+      return;
+    }
+
+    if (btn.classList.contains("btn-excluir")) {
+      const ok = confirm("Tem certeza que deseja excluir esta proposta?");
+      if (!ok) return;
+      propostas = propostas.filter((p) => p.id !== id);
+      salvarPropostas();
+      aplicarFiltros();
+      return;
+    }
+  });
 
   function marcarStatusRapido(id, novoStatus) {
     const idx = propostas.findIndex((p) => p.id === id);
@@ -1160,6 +1281,7 @@
       const mapa = { aberta: "Abertas", ganha: "Ganhas", perdida: "Perdidas/Canceladas" };
       partes.push(`Etapa: ${mapa[etapa] || ""}`);
     }
+
     if (ordenar === "recentes") partes.push("Ordenado: mais recentes");
     if (ordenar === "antigas") partes.push("Ordenado: mais antigas");
     if (ordenar === "maior-valor") partes.push("Ordenado: maior valor");
@@ -1179,6 +1301,7 @@
     atualizarKpis(lista);
     atualizarTabela(lista);
     atualizarGrafico(lista);
+    renderPmPanel(); // ✅ cronograma PM atualizado junto
   }
 
   inputBusca.addEventListener("input", aplicarFiltros);
@@ -1265,8 +1388,6 @@
 
     document.getElementById("novo-prazo-interno").value = "";
     document.getElementById("novo-alerta-dias").value = "3";
-
-    syncDisabledByCheck();
   }
 
   function abrirModalNovo() {
@@ -1294,7 +1415,6 @@
     setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
     setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
 
-    syncDisabledByCheck();
     atualizarValorTotalUI();
   }
 
@@ -1313,7 +1433,7 @@
     document.getElementById("novo-cidade").value = proposta.cidade || "";
     document.getElementById("novo-uf").value = (proposta.uf || "").toUpperCase();
 
-    document.getElementById("novo-status").value = proposta.status || "Aberta";
+    document.getElementById("novo-status").value = (proposta.status || "Aberta").startsWith("Perdida") ? "Perdida" : (proposta.status || "Aberta");
     document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
 
     const de = (proposta.dataEntrada || hojeISO());
@@ -1368,19 +1488,12 @@
     const prazoInterno = document.getElementById("novo-prazo-interno").value;
     const alertaDias = document.getElementById("novo-alerta-dias").value;
 
-    if (!cliente) {
-      alert("Informe o nome do cliente.");
-      return;
-    }
+    if (!cliente) { alert("Informe o nome do cliente."); return; }
 
     const { baixa, media, cftv, cabeamento, total } = obterServicosDaUI();
-    const servicosObj = { baixa, media, cftv, cabeamento };
     const valor = total;
 
-    if (!valor || valor <= 0) {
-      alert("Informe ao menos um serviço com valor maior que zero.");
-      return;
-    }
+    if (!valor || valor <= 0) { alert("Informe ao menos um serviço com valor maior que zero."); return; }
 
     if (status.startsWith("Perdida")) {
       const ok = confirm("Confirmar: salvar esta proposta como Perdida / Cancelada?");
@@ -1390,43 +1503,20 @@
     const updatedAt = `${hojeISO()} ${agoraHHMM()}`;
 
     if (editingId === null) {
-      const novo = normalizarProposta({
+      propostas.push(normalizarProposta({
         id: Date.now(),
-        numero,
-        cliente,
-        parceiro,
-        responsavel,
-        cidade,
-        uf,
-        servicos: servicosObj,
-        valor,
-        status,
-        dataEntrada,
-        prazo,
-        prazoInterno,
-        alertaDias,
-        updatedAt,
-      });
-      propostas.push(novo);
+        numero, cliente, parceiro, responsavel, cidade, uf,
+        servicos: { baixa, media, cftv, cabeamento },
+        valor, status, dataEntrada, prazo, prazoInterno, alertaDias, updatedAt
+      }));
     } else {
       const idx = propostas.findIndex((p) => p.id === editingId);
       if (idx !== -1) {
         propostas[idx] = normalizarProposta({
           ...propostas[idx],
-          numero,
-          cliente,
-          parceiro,
-          responsavel,
-          cidade,
-          uf,
-          servicos: servicosObj,
-          valor,
-          status,
-          dataEntrada,
-          prazo,
-          prazoInterno,
-          alertaDias,
-          updatedAt,
+          numero, cliente, parceiro, responsavel, cidade, uf,
+          servicos: { baixa, media, cftv, cabeamento },
+          valor, status, dataEntrada, prazo, prazoInterno, alertaDias, updatedAt
         });
       }
     }
@@ -1457,7 +1547,7 @@
   }
 
   servicoChecks.forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => syncDisabledByCheck());
+    document.getElementById(id).addEventListener("change", syncDisabledByCheck);
   });
 
   servicoInputs.forEach((id) => {
@@ -1471,7 +1561,6 @@
 
     el.addEventListener("input", () => {
       el.value = apenasDigitos(el.value);
-
       const map = {
         "val-servico-bt": "chk-servico-bt",
         "val-servico-mt": "chk-servico-mt",
@@ -1480,7 +1569,6 @@
       };
       const chk = document.getElementById(map[id]);
       if (!chk.checked && el.value.length > 0) chk.checked = true;
-
       syncDisabledByCheck();
     });
 
@@ -1526,6 +1614,109 @@
       reader.readAsText(file);
     };
     input.click();
+  });
+
+  // ===== PM / Project Management timeline (Ganhas) =====
+  const PM_SELECTED_KEY = "crm_pm_selected_ganha_id";
+
+  const pmPanel = document.getElementById("pm-panel");
+  const pmSelect = document.getElementById("pm-select");
+  const pmMeta = document.getElementById("pm-meta");
+  const pmProgress = document.getElementById("pm-progress");
+  const pmToday = document.getElementById("pm-today");
+  const pmLabelStart = document.getElementById("pm-label-start");
+  const pmLabelEnd = document.getElementById("pm-label-end");
+  const pmLabelToday = document.getElementById("pm-label-today");
+  const pmFooter = document.getElementById("pm-footer");
+
+  function diffDiasEntre(inicioISO, fimISO){
+    if(!inicioISO || !fimISO) return null;
+    const a = new Date(inicioISO + "T00:00:00");
+    const b = new Date(fimISO + "T00:00:00");
+    return Math.round((b - a) / (1000*60*60*24));
+  }
+
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+  function listarGanhasComPrazo(){
+    return propostas
+      .filter(p => p.status === "Ganha" && p.dataEntrada && p.prazo)
+      .sort((a,b) => (a.prazo || "").localeCompare(b.prazo || ""));
+  }
+
+  function renderPmPanel(){
+    const ganhas = listarGanhasComPrazo();
+
+    if(!ganhas.length){
+      pmPanel.style.display = "none";
+      return;
+    }
+
+    pmPanel.style.display = "block";
+
+    const saved = localStorage.getItem(PM_SELECTED_KEY);
+    let selectedId = saved ? Number(saved) : ganhas[0].id;
+    if (!ganhas.some(p => p.id === selectedId)) selectedId = ganhas[0].id;
+
+    pmSelect.innerHTML = ganhas.map(p => {
+      const titulo = `${(p.numero || "—")} • ${(p.cliente || "Cliente")}`;
+      return `<option value="${p.id}">${titulo}</option>`;
+    }).join("");
+
+    pmSelect.value = String(selectedId);
+
+    const p = ganhas.find(x => x.id === selectedId) || ganhas[0];
+
+    const start = p.dataEntrada;
+    const end = p.prazo;
+    const today = hojeISO();
+
+    const total = diffDiasEntre(start, end);
+    const elapsed = diffDiasEntre(start, today);
+    const remaining = diffDiasEntre(today, end);
+
+    const totalSafe = (total !== null && total > 0) ? total : 1;
+    const elapsedClamped = clamp(elapsed ?? 0, 0, totalSafe);
+    const pct = (elapsedClamped / totalSafe) * 100;
+
+    const track = pmPanel.querySelector(".pm-track");
+    const leftPad = 10;
+    const rightPad = 10;
+    const usable = track.clientWidth - leftPad - rightPad;
+
+    const x = leftPad + (pct/100) * usable;
+    pmToday.style.left = `${x}px`;
+    pmLabelToday.style.left = `${x}px`;
+
+    pmProgress.style.width = `${pct}%`;
+
+    pmLabelStart.textContent = formatarDataBR(start);
+    pmLabelEnd.textContent = formatarDataBR(end);
+
+    pmMeta.innerHTML = `
+      <div><b>${p.cliente || "—"}</b> • ${p.numero || "—"}</div>
+      <div style="margin-top:2px;">Prazo final: <b>${formatarDataBR(end)}</b> (início: ${formatarDataBR(start)})</div>
+    `;
+
+    const statusPrazo =
+      remaining < 0 ? `Vencido há ${Math.abs(remaining)} dia(s)` :
+      remaining === 0 ? "Vence hoje" :
+      `Faltam ${remaining} dia(s)`;
+
+    pmFooter.innerHTML = `
+      <span>Progresso: <b>${Math.round(pct)}%</b> (${elapsedClamped}/${totalSafe} dias)</span>
+      <span>${statusPrazo}</span>
+    `;
+  }
+
+  pmSelect.addEventListener("change", () => {
+    localStorage.setItem(PM_SELECTED_KEY, pmSelect.value);
+    renderPmPanel();
+  });
+
+  // re-render do PM ao redimensionar (mantém marcador "Hoje" no lugar certo)
+  window.addEventListener("resize", () => {
+    if (pmPanel.style.display !== "none") renderPmPanel();
   });
 
   // ---------- INICIALIZA ----------
