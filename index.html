@@ -355,7 +355,6 @@
 
 <body>
 <div class="app">
-  <!-- HEADER -->
   <header class="header">
     <div class="header-left">
       <div class="brand">
@@ -378,9 +377,7 @@
     </div>
   </header>
 
-  <!-- GRID SUPERIOR -->
   <div class="grid-top">
-    <!-- VISÃO GERAL -->
     <section class="card">
       <div class="card-title">Visão geral</div>
 
@@ -434,7 +431,6 @@
           <div class="kpi-label">Última atualização</div>
           <div class="kpi-value" id="kpi-updated">—</div>
         </div>
-
         <div class="kpi-mini">
           <div class="kpi-label">Interno vencido</div>
           <div class="kpi-value" id="kpi-interno-vencido">0</div>
@@ -446,19 +442,14 @@
       </div>
     </section>
 
-    <!-- FILTROS -->
     <section class="card">
       <div class="card-title">Filtros</div>
 
       <div class="filters-row">
         <div class="filters-top">
           <div class="filters-group">
-            <input
-              type="text"
-              class="input"
-              id="filtro-busca"
-              placeholder="Buscar por nº, cliente, parceiro, responsável, cidade/UF, serviço..."
-            />
+            <input type="text" class="input" id="filtro-busca"
+              placeholder="Buscar por nº, cliente, parceiro, responsável, cidade/UF, serviço..." />
 
             <select class="select" id="filtro-etapa">
               <option value="todas">Todas as etapas</option>
@@ -490,7 +481,6 @@
     </section>
   </div>
 
-  <!-- GRÁFICO EM PIZZA -->
   <section class="card card-chart">
     <div class="card-title">Distribuição dos valores por status</div>
     <div class="card-chart-body">
@@ -498,7 +488,6 @@
     </div>
   </section>
 
-  <!-- LISTA / TABELA -->
   <section class="card card-list">
     <div class="card-title">Propostas</div>
 
@@ -524,7 +513,6 @@
   </section>
 </div>
 
-<!-- MODAL NOVA/EDITAR PROPOSTA -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <div class="modal-header">
@@ -570,31 +558,19 @@
         <label>Serviços e valores</label>
         <div class="servicos-grid">
           <div class="servico-row">
-            <label>
-              <input type="checkbox" id="chk-servico-bt">
-              Elétrico Baixa Tensão
-            </label>
+            <label><input type="checkbox" id="chk-servico-bt"> Elétrico Baixa Tensão</label>
             <input type="text" id="val-servico-bt" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
-            <label>
-              <input type="checkbox" id="chk-servico-mt">
-              Elétrico Média Tensão
-            </label>
+            <label><input type="checkbox" id="chk-servico-mt"> Elétrico Média Tensão</label>
             <input type="text" id="val-servico-mt" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
-            <label>
-              <input type="checkbox" id="chk-servico-cftv">
-              CFTV
-            </label>
+            <label><input type="checkbox" id="chk-servico-cftv"> CFTV</label>
             <input type="text" id="val-servico-cftv" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
           <div class="servico-row">
-            <label>
-              <input type="checkbox" id="chk-servico-cab">
-              Cabeamento Estruturado
-            </label>
+            <label><input type="checkbox" id="chk-servico-cab"> Cabeamento Estruturado</label>
             <input type="text" id="val-servico-cab" inputmode="numeric" placeholder="R$ 0,00" />
           </div>
         </div>
@@ -657,11 +633,10 @@
 
 <script>
   // =========================================================
-  //  ✅ Ajustes incluídos:
-  //  - Serviços: não soma 1000 / não explode valor (sem formatar durante digitação; formata no blur)
-  //  - Prazo cliente: campo em dias + preview da data final (verde / amarelo <=10 / vermelho vencido)
-  //  - Salvar: grava "prazo" como data final (ISO) calculada por (dataEntrada + dias)
-  //  - Prazo interno: mantém tags e KPI (vencido / até 7 dias)
+  //  ✅ Ajustes finais incluídos:
+  //  - Botão Excluir funcionando
+  //  - Colspan correto quando não há dados
+  //  - Listener do "Excluir" adicionado no lugar certo (após renderizar a tabela)
   // =========================================================
 
   // ---------- UTILIDADES ----------
@@ -702,7 +677,7 @@
     return `${d}/${m}/${y}`;
   }
 
-  // ---------- PRAZOS (helpers) ----------
+  // ---------- PRAZOS ----------
   function diffDias(isoData) {
     if (!isoData) return null;
     const hoje = new Date(hojeISO() + "T00:00:00");
@@ -720,7 +695,6 @@
     return base.toISOString().slice(0, 10);
   }
 
-  // prazo interno: label + classe
   function classPrazoInterno(p) {
     const dias = diffDias(p.prazoInterno);
     if (dias === null) return { label: "—", cls: "tag-ganha" };
@@ -729,7 +703,6 @@
 
     const alerta = Number.isFinite(Number(p.alertaDias)) ? Number(p.alertaDias) : 3;
     if (dias <= alerta) return { label: `Próximo (${dias}d)`, cls: "tag-atrasada" };
-
     return { label: `Em dia (${dias}d)`, cls: "tag-ganha" };
   }
 
@@ -768,7 +741,6 @@
 
   let propostas = carregarPropostas();
 
-  // Migração / normalização
   function normalizarProposta(p) {
     const serv = p.servicos || {
       baixa: parseValor(p.baixa),
@@ -798,7 +770,7 @@
       valor,
       status: p.status || "Aberta",
       dataEntrada: p.dataEntrada || p.data || hojeISO(),
-      prazo: p.prazo || "",                 // PRAZO CLIENTE (data final ISO)
+      prazo: p.prazo || "",
       prazoInterno: p.prazoInterno || "",
       alertaDias: (p.alertaDias != null && p.alertaDias !== "") ? Number(p.alertaDias) : 3,
       updatedAt: p.updatedAt || "",
@@ -861,14 +833,12 @@
     const valCab  = chkCab  ? parseValor(elCab.value)  : 0;
 
     const total = valBt + valMt + valCftv + valCab;
-
     return { baixa: valBt, media: valMt, cftv: valCftv, cabeamento: valCab, total };
   }
 
   function atualizarValorTotalUI() {
     const { total } = obterServicosDaUI();
-    const inputTotal = document.getElementById("novo-valor-total");
-    inputTotal.value = total ? formatarMoeda(total) : "";
+    document.getElementById("novo-valor-total").value = total ? formatarMoeda(total) : "";
   }
 
   // ---------- KPIs ----------
@@ -897,7 +867,6 @@
     const conversao = denom > 0 ? (ganhas / denom) * 100 : 0;
     const ticket = ganhas > 0 ? (valorGanho / ganhas) : 0;
 
-    // prazos internos (KPI)
     const internoVencido = lista.filter(p => p.prazoInterno && diffDias(p.prazoInterno) < 0).length;
     const internoAte7 = lista.filter(p => {
       const d = diffDias(p.prazoInterno);
@@ -929,11 +898,7 @@
       pill.classList.add("bad");
     }
 
-    const updated = lista
-      .map(p => p.updatedAt || "")
-      .filter(Boolean)
-      .sort()
-      .pop();
+    const updated = lista.map(p => p.updatedAt || "").filter(Boolean).sort().pop();
     document.getElementById("kpi-updated").textContent = updated ? updated : "—";
   }
 
@@ -960,56 +925,57 @@
 
   function atualizarTabela(lista) {
     const tbody = document.getElementById("tabela-propostas");
+
     if (lista.length === 0) {
       tbody.innerHTML =
         '<tr><td colspan="12" style="text-align:center; padding:0.6rem; color:#6b7280;">Nenhuma proposta encontrada.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = lista
-      .map((p) => {
-        const num = (p.numero || "").trim();
-        const resp = (p.responsavel || "").trim();
-        const cuf = cidadeUf(p);
+    tbody.innerHTML = lista.map((p) => {
+      const num = (p.numero || "").trim();
+      const resp = (p.responsavel || "").trim();
+      const cuf = cidadeUf(p);
 
-        const btnGanha = p.status === "Ganha"
-          ? ""
-          : `<button class="btn-table success btn-marcar" data-id="${p.id}" data-status="Ganha">Marcar ganha</button>`;
+      const btnGanha = p.status === "Ganha"
+        ? ""
+        : `<button class="btn-table success btn-marcar" data-id="${p.id}" data-status="Ganha">Marcar ganha</button>`;
 
-        const btnPerdida = (p.status && p.status.startsWith("Perdida"))
-          ? ""
-          : `<button class="btn-table danger btn-marcar" data-id="${p.id}" data-status="Perdida">Marcar perdida</button>`;
+      const btnPerdida = (p.status && p.status.startsWith("Perdida"))
+        ? ""
+        : `<button class="btn-table danger btn-marcar" data-id="${p.id}" data-status="Perdida">Marcar perdida</button>`;
 
-        const pi = classPrazoInterno(p);
+      const pi = classPrazoInterno(p);
 
-        const prazoInternoCell = p.prazoInterno
-          ? `<span class="tag-status ${pi.cls}">${pi.label}</span>
-             <div style="color:#a1a5b5; font-size:0.7rem; margin-top:0.15rem;">${p.prazoInterno}</div>`
-          : `<span class="tag-status tag-ganha">—</span>`;
+      const prazoInternoCell = p.prazoInterno
+        ? `<span class="tag-status ${pi.cls}">${pi.label}</span>
+           <div style="color:#a1a5b5; font-size:0.7rem; margin-top:0.15rem;">${p.prazoInterno}</div>`
+        : `<span class="tag-status tag-ganha">—</span>`;
 
-        return `
-          <tr>
-            <td>${num}</td>
-            <td>${p.cliente || ""}</td>
-            <td>${p.parceiro || ""}</td>
-            <td>${resp}</td>
-            <td>${cuf}</td>
-            <td>${descricaoServicos(p)}</td>
-            <td>${formatarMoeda(p.valor || 0)}</td>
-            <td>${linhaStatusTag(p.status, p.prazo)}</td>
-            <td>${p.dataEntrada || ""}</td>
-            <td>${p.prazo || ""}</td>
-            <td>${prazoInternoCell}</td>
-            <td>
-              <button class="btn-table btn-editar" data-id="${p.id}">Editar</button>
-              ${btnGanha}
-              ${btnPerdida}
-            </td>
-          </tr>
-        `;
-      })
-      .join("");
+      return `
+        <tr>
+          <td>${num}</td>
+          <td>${p.cliente || ""}</td>
+          <td>${p.parceiro || ""}</td>
+          <td>${resp}</td>
+          <td>${cuf}</td>
+          <td>${descricaoServicos(p)}</td>
+          <td>${formatarMoeda(p.valor || 0)}</td>
+          <td>${linhaStatusTag(p.status, p.prazo)}</td>
+          <td>${p.dataEntrada || ""}</td>
+          <td>${p.prazo || ""}</td>
+          <td>${prazoInternoCell}</td>
+          <td>
+            <button class="btn-table btn-editar" data-id="${p.id}">Editar</button>
+            ${btnGanha}
+            ${btnPerdida}
+            <button class="btn-table danger btn-excluir" data-id="${p.id}">Excluir</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
+    // Editar
     document.querySelectorAll(".btn-editar").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.dataset.id);
@@ -1017,11 +983,27 @@
       });
     });
 
+    // Marcar status
     document.querySelectorAll(".btn-marcar").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.dataset.id);
         const status = btn.dataset.status;
         marcarStatusRapido(id, status);
+      });
+    });
+
+    // Excluir
+    document.querySelectorAll(".btn-excluir").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+
+        const ok = confirm("Tem certeza que deseja excluir esta proposta?");
+        if (!ok) return;
+
+        propostas = propostas.filter((p) => p.id !== id);
+
+        salvarPropostas();
+        aplicarFiltros();
       });
     });
   }
@@ -1048,14 +1030,12 @@
 
   function somarValoresPorStatus(lista) {
     const soma = { abertas: 0, ganhas: 0, perdidas: 0 };
-
     lista.forEach((p) => {
       const valor = parseValor(p.valor);
       if (p.status === "Aberta") soma.abertas += valor;
       else if (p.status === "Ganha") soma.ganhas += valor;
       else if (p.status && p.status.startsWith("Perdida")) soma.perdidas += valor;
     });
-
     return soma;
   }
 
@@ -1078,21 +1058,14 @@
 
     if (!chartValores) {
       const ctx = document.getElementById("chart-valores").getContext("2d");
-
       chartValores = new Chart(ctx, {
         type: "pie",
-        data: {
-          labels: dataLabels,
-          datasets: [{ data: dataValues, backgroundColor: cores, borderWidth: 1 }],
-        },
+        data: { labels: dataLabels, datasets: [{ data: dataValues, backgroundColor: cores, borderWidth: 1 }] },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              position: "bottom",
-              labels: { color: "#e5e7eb", font: { size: 11 } },
-            },
+            legend: { position: "bottom", labels: { color: "#e5e7eb", font: { size: 11 } } },
             tooltip: {
               callbacks: {
                 label(context) {
@@ -1156,7 +1129,6 @@
       lista = lista.filter((p) => {
         const dias = diffDias(p.prazoInterno);
         if (dias === null) return false;
-
         if (filtroPrazoInterno === "vencidos") return dias < 0;
         if (filtroPrazoInterno === "hoje") return dias === 0;
         if (filtroPrazoInterno === "ate7") return dias >= 0 && dias <= 7;
@@ -1174,11 +1146,9 @@
       if (ordenar === "prazo-interno") {
         const da = diffDias(a.prazoInterno);
         const db = diffDias(b.prazoInterno);
-
         if (da === null && db === null) return 0;
         if (da === null) return 1;
         if (db === null) return -1;
-
         return da - db;
       }
       return 0;
@@ -1190,7 +1160,6 @@
       const mapa = { aberta: "Abertas", ganha: "Ganhas", perdida: "Perdidas/Canceladas" };
       partes.push(`Etapa: ${mapa[etapa] || ""}`);
     }
-
     if (ordenar === "recentes") partes.push("Ordenado: mais recentes");
     if (ordenar === "antigas") partes.push("Ordenado: mais antigas");
     if (ordenar === "maior-valor") partes.push("Ordenado: maior valor");
@@ -1198,12 +1167,7 @@
     if (ordenar === "prazo-interno") partes.push("Ordenado: prazo interno");
 
     if (filtroPrazoInterno !== "todos") {
-      const mapaPI = {
-        vencidos: "Interno: vencidos",
-        hoje: "Interno: hoje",
-        ate7: "Interno: até 7 dias",
-        ate30: "Interno: até 30 dias"
-      };
+      const mapaPI = { vencidos: "Interno: vencidos", hoje: "Interno: hoje", ate7: "Interno: até 7 dias", ate30: "Interno: até 30 dias" };
       partes.push(mapaPI[filtroPrazoInterno] || "Interno: filtro");
     }
 
@@ -1260,7 +1224,7 @@
     const d = diffDias(prazoFinal);
     if (d !== null) {
       if (d < 0) previewPrazoFinal.classList.add("tag-perdida");
-      else if (d <= 10) previewPrazoFinal.classList.add("tag-atrasada"); // <= 10 dias (amarelo)
+      else if (d <= 10) previewPrazoFinal.classList.add("tag-atrasada");
       else previewPrazoFinal.classList.add("tag-ganha");
     } else {
       previewPrazoFinal.classList.add("tag-ganha");
@@ -1294,15 +1258,15 @@
     document.getElementById("novo-status").value = "Aberta";
     document.getElementById("novo-data-entrada").value = "";
 
-    // prazo cliente em dias
     document.getElementById("novo-prazo-dias").value = "";
     previewPrazoFinal.textContent = "—";
     previewPrazoFinal.classList.remove("tag-atrasada", "tag-perdida");
     previewPrazoFinal.classList.add("tag-ganha");
 
-    // prazo interno
     document.getElementById("novo-prazo-interno").value = "";
     document.getElementById("novo-alerta-dias").value = "3";
+
+    syncDisabledByCheck();
   }
 
   function abrirModalNovo() {
@@ -1330,6 +1294,7 @@
     setRow("chk-servico-cftv", "val-servico-cftv", s.cftv || 0);
     setRow("chk-servico-cab", "val-servico-cab", s.cabeamento || 0);
 
+    syncDisabledByCheck();
     atualizarValorTotalUI();
   }
 
@@ -1351,7 +1316,6 @@
     document.getElementById("novo-status").value = proposta.status || "Aberta";
     document.getElementById("novo-data-entrada").value = proposta.dataEntrada || "";
 
-    // preencher "dias" a partir de (prazo - dataEntrada)
     const de = (proposta.dataEntrada || hojeISO());
     const pf = (proposta.prazo || "");
     let diasCalc = "";
@@ -1398,7 +1362,6 @@
 
     const dataEntrada = document.getElementById("novo-data-entrada").value || hojeISO();
 
-    // prazo cliente: dias -> data final
     const prazoDias = document.getElementById("novo-prazo-dias").value;
     const prazo = (prazoDias !== "" ? addDiasISO(dataEntrada, prazoDias) : "");
 
@@ -1494,12 +1457,9 @@
   }
 
   servicoChecks.forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
-      syncDisabledByCheck();
-    });
+    document.getElementById(id).addEventListener("change", () => syncDisabledByCheck());
   });
 
-  // ✅ Não formatar no "input" (evita somar / explodir valor). Formata no blur.
   servicoInputs.forEach((id) => {
     const el = document.getElementById(id);
 
